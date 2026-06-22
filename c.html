@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>COPA Learning Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f2f6f8;
+            color: #333;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: #3b7b8e;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* ---- NEW: Extreme Left Back Button Styling ---- */
+        .back-wrapper {
+            padding: 25px 0 0 40px; /* Top se 25px aur Left se 40px ka gap */
+            position: absolute; /* Isse button apni jagah par fix rahega */
+            z-index: 10;
+        }
+
+        .back-btn-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #3b7b8e; /* Same as header color */
+            color: white; 
+            padding: 12px 25px;
+            border-radius: 30px; 
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn-pro:hover {
+            background-color: #2c3e50; /* Hover par thoda dark color */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(-5px); /* Hover par left slide hoga */
+        }
+
+        .back-btn-pro svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        /* --------------------------------------------- */
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+            /* Taki button overlap na kare chhoti screen par */
+            padding-top: 20px; 
+        }
+
+        /* Welcome Section */
+        .welcome-section {
+            background-color: white;
+            padding: 25px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        /* Grid Layout for Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+            margin-bottom: 50px;
+        }
+
+        /* Individual Card Styling */
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            min-height: 280px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Top Colored Borders for Cards */
+        .card-study { border-top: 5px solid #3498db; }
+        .card-skills { border-top: 5px solid #e67e22; }
+        .card-qb { border-top: 5px solid #9b59b6; }
+        .card-mock { border-top: 5px solid #2ecc71; }
+        .card-quiz { border-top: 5px solid #e74c3c; }
+
+        .card h3 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #777;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            background-color: #53a3b5;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #3b7b8e;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+          
+    <header>
+        <h1>COPA</h1>
+        <p>Computer Operator & Programming Assistant | Study Material & Employability</p>
+    </header>
+
+    <!-- NEW: Back Button placed OUTSIDE the centered container for extreme left alignment -->
+    <div class="back-wrapper">
+        <a href="javascript:history.back()" class="back-btn-pro">
+            <svg viewBox="0 0 24 24">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+            </svg>
+            Back
+        </a>
+    </div>
+
+    <div class="container">
+        
+        <section class="card-grid">
+            
+            <div class="card card-study">
+                <h3>📚 Study Material</h3>
+                <p>COPA ke saare modules (MS Office, Tally, Internet) ke PDF Notes aur Video Lectures yahan se download karein.</p>
+                <a href="C- TT.html" class="btn">Open Notes</a>
+            </div>
+
+            <div class="card card-skills">
+                <h3>💼 Employability Skills</h3>
+                <p>Resume building, Interview tips, communication skills aur placement ki taiyari karein.</p>
+                <a href="C-ES 2.html" class="btn">Start Learning</a>
+            </div>
+
+            <div class="card card-mock">
+                <h3>📃 Question Bank</h3>
+                <p>Apne aap ko final exam ke liye test karein. Full length exams ko time limit ke saath practice karein.</p>
+                <a href="C- MT 3.html" class="btn">Open Question Bank</a>
+            </div>
+
+            <div class="card card-quiz">
+                <h3>✅ Mock Test</h3>
+                <p>Chapter-wise chote quiz attempt karein aur apne concepts ko instantly check karein.</p>
+                <a href="copamock.html" class="btn">Start Mock Test</a>
+            </div>
+
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2026 Field Learning Hub - All Rights Reserved</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning Hub - Syllabus</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#eef2ff,#f8fafc);
+    min-height:100vh;
+}
+
+.header{
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
+    color:white;
+    text-align:center;
+    padding:60px 20px;
+}
+
+.header h1{
+    font-size:45px;
+    margin-bottom:10px;
+}
+
+.header p{
+    font-size:18px;
+    opacity:.9;
+}
+
+.container{
+    width:90%;
+    max-width:1200px;
+    margin:60px auto;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:30px;
+}
+
+.card{
+    background:white;
+    border-radius:25px;
+    padding:35px;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 15px 40px rgba(0,0,0,0.15);
+}
+
+.icon{
+    font-size:70px;
+    margin-bottom:15px;
+}
+
+.card h2{
+    color:#1e293b;
+    margin-bottom:10px;
+}
+
+.card p{
+    color:#64748b;
+    margin-bottom:20px;
+}
+
+.btn{
+    display:inline-block;
+    padding:12px 25px;
+    background:#4f46e5;
+    color:white;
+    text-decoration:none;
+    border-radius:30px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#3730a3;
+}
+
+.back-btn{
+    display:block;
+    width:220px;
+    margin:50px auto;
+    text-align:center;
+    text-decoration:none;
+    background:#4f46e5;
+    color:white;
+    padding:14px;
+    border-radius:30px;
+    font-weight:bold;
+}
+
+.back-btn:hover{
+    background:#3730a3;
+}
+
+.footer{
+    background:#0f172a;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:50px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📋 Trade Syllabus</h1>
+    <p>Select Your Trade and Explore Complete Syllabus</p>
+</div>
+
+<div class="container">
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="icon">💻</div>
+            <h2>COPA</h2>
+            <p>Computer Operator & Programming Assistant</p>
+            <a href="copa-syllabus.html" class="btn">
+                View Syllabus →
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon">⚡</div>
+            <h2>Electrician</h2>
+            <p>Electrical Installation & Maintenance</p>
+            <a href="electrician-syllabus.html" class="btn">
+                View Syllabus →
+            </a>
+        </div>
+
+        <div class="card">
+            <div class="icon">📡</div>
+            <h2>Electronics</h2>
+            <p>Electronics & Circuit Technology</p>
+            <a href="electronics-syllabus.html" class="btn">
+                View Syllabus →
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<a href="index.html" class="back-btn">⬅ Back to Learning Hub</a>
+
+<div class="footer">
+    © 2026 Learning Hub | Syllabus Section
+</div>
+
+</body>
+</html>

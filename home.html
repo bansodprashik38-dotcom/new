@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITI Learning Hub - COPA, Electronics & Electrician</title>
+    <style>
+        /* Base Styles */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Smooth scrolling logic for anchor links */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: #2d3748;
+            background-color: #f7fafc;
+        }
+        
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        ul {
+            list-style: none;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 60px 0;
+        }
+        /* 1. Header */
+        
+        header {
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 5%;
+        }
+        
+        /* Logo Styles */
+        .logo {
+            font-size: 26px;
+            font-weight: 800;
+            color: #e53e3e;
+            letter-spacing: -0.5px;
+        }
+        
+        .logo a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo img {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            font-weight: 500;
+            color: #4a5568;
+            transition: color 0.2s;
+        }
+        
+        .nav-links a:hover {
+            color: #e53e3e;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+        
+        .btn-outline {
+            border: 2px solid #e53e3e;
+            color: #e53e3e;
+            background: transparent;
+            width: 100%;
+        }
+        
+        .btn-outline:hover {
+            background: #e53e3e;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: #e53e3e;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(229, 62, 62, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: #c53030;
+            transform: translateY(-1px);
+            box-shadow: 0 7px 14px rgba(229, 62, 62, 0.3);
+        }
+        /* 2. Hero Section */
+        
+        .hero {
+            position: relative;
+            background: radial-gradient(circle at 80% 20%, #2d3748 0%, #1a202c 100%);
+            color: #fff;
+            text-align: center;
+            padding: 140px 20px;
+            overflow: hidden;
+        }
+        
+        /* Geometric Tech Grid Overlay */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black, transparent 80%);
+        }
+        
+        .hero::after {
+            content: "";
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(229, 62, 62, 0.15);
+            filter: blur(80px);
+            border-radius: 50%;
+            top: 10%;
+            left: 10%;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 35px;
+            color: #cbd5e0;
+            font-weight: 400;
+        }
+        
+        .hero .btn-primary {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+        /* 3. Stats Section */
+        
+        .stats {
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 35px 5%;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        
+        .stats-item h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #e53e3e;
+            margin-bottom: 5px;
+        }
+        
+        .stats-item p {
+            font-size: 1rem;
+            color: #718096;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 50px;
+            color: #1a202c;
+            letter-spacing: -0.5px;
+        }
+        /* 4. Our Core Trades (FIXED SCROLL GAP HERE) */
+        
+        #trades {
+            scroll-margin-top: 90px; /* Isse heading navbar ke peeche nahi chupegi */
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 35px;
+        }
+        
+        .trade-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border-top: 6px solid #e53e3e;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        
+        .trade-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .trade-icon {
+            font-size: 55px;
+            margin-bottom: 20px;
+            background: #fff5f5;
+            width: 90px;
+            height: 90px;
+            line-height: 90px;
+            border-radius: 50%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .trade-card h3 {
+            font-size: 1.6rem;
+            color: #1a202c;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .trade-card p {
+            color: #4a5568;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+        /* 5. Testimonials Section (FIXED SCROLL GAP HERE) */
+        
+        .testimonials-section {
+            background: #fff;
+            border-top: 1px solid #edf2f7;
+            border-bottom: 1px solid #edf2f7;
+            scroll-margin-top: 90px; /* Yahan bhi add kiya taaki reviews link bhi perfect scroll ho */
+        }
+
+        .testimonial-card {
+            background: #f7fafc;
+            padding: 35px 30px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            border-left: 5px solid #e53e3e;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .testimonial-card:hover {
+            background: #fff;
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-left-color: #c53030;
+        }
+
+        .testimonial-stars {
+            color: #e53e3e;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .testimonial-quote {
+            font-size: 1rem;
+            color: #4a5568;
+            line-height: 1.75;
+            font-style: italic;
+            flex-grow: 1;
+        }
+
+        .testimonial-quote::before {
+            content: "\201C";
+            font-size: 2.5rem;
+            color: #e53e3e;
+            line-height: 0;
+            vertical-align: -0.6rem;
+            margin-right: 4px;
+            font-style: normal;
+        }
+
+        .testimonial-person {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-top: 1px solid #edf2f7;
+            padding-top: 18px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 6px rgba(229, 62, 62, 0.25);
+        }
+
+        .testimonial-info .name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .testimonial-info .trade-badge {
+            display: inline-block;
+            margin-top: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e53e3e;
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 20px;
+            padding: 2px 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        /* 9. Final CTA */
+        
+        .cta-bottom {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: #fff;
+            text-align: center;
+            padding: 80px 20px;
+            position: relative;
+        }
+        
+        .cta-bottom h2 {
+            font-size: 2.3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+        
+        .cta-bottom p {
+            color: #cbd5e0;
+            margin-bottom: 30px;
+        }
+        /* 10. Footer */
+        
+        footer {
+            background: #1a202c;
+            color: #a0aec0;
+            padding: 70px 5% 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            border-top: 1px solid #2d3748;
+            font-size: 0.95rem;
+        }
+        
+        footer h4 {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        footer ul li {
+            margin-bottom: 12px;
+        }
+        
+        footer ul li a {
+            transition: color 0.2s;
+        }
+        
+        footer ul li a:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="navbar">
+            <div class="logo">
+                <a href="#">
+                    <img src="image_cc7ae1 (1).png" alt="ITI Learning Hub Logo">
+                    <span>Learning Hub</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#">Home</a></li>
+                <li><a href="#trades">Trades</a></li>
+                <li><a href="#structure">Students Review</a></li>
+                <li><a href="mocktest.html">Mock Tests</a></li>
+            </ul>
+            <div class="auth-buttons"></div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Master Your Trade Skills</h1>
+            <p>COPA, Electronics aur Electrician trades ki poori taiyari ek hi platform par. Theory, Practical aur CBT Exams ki best preparation.</p>
+            <a href="#trades"><button class="btn btn-primary">Start Learning</button></a>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-item">
+            <h3>3</h3>
+            <p>Core Trades</p>
+        </div>
+        <div class="stats-item">
+            <h3>150+</h3>
+            <p>Practicals</p>
+        </div>
+        <div class="stats-item">
+            <h3>500+</h3>
+            <p>Daily Quizzes</p>
+        </div>
+    </section>
+
+    <section class="container" id="trades">
+        <h2 class="section-title">Explore Your Trades</h2>
+        <div class="grid-3">
+            <div class="trade-card">
+                <div>
+                    <div class="trade-icon">💻</div>
+                    <h3>COPA</h3>
+                    <p>Computer Operator & Programming Assistant. Basic computer se lekar programming, database aur web designing tak sab kuch seekhein.</p>
+                </div>
+                <a href="C.html"><button class="btn btn-outline">Explore COPA</button></a>
+            </div>
+            <div class="trade-card">
+                <div>
+                    <div class="trade-icon">🔌</div>
+                    <h3>ELECTRONICS</h3>
+                    <p>Electronic components, circuits, microcontrollers aur modern electronic devices ki in-depth knowledge aur repairing.</p>
+                </div>
+                <a href="e.html"><button class="btn btn-outline">Explore Electronics</button></a>
+            </div>
+            <div class="trade-card">
+                <div>
+                    <div class="trade-icon">⚡</div>
+                    <h3>ELECTRICIAN</h3>
+                    <p>House wiring, industrial wiring, AC/DC machines, transformers aur electrical safety ke baare mein complete training.</p>
+                </div>
+                <a href="El.html"><button class="btn btn-outline">Explore Electrician</button></a>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials-section" id="structure">
+        <div class="container">
+            <h2 class="section-title">Students Review</h2>
+            <div class="grid-3">
+
+                <div class="testimonial-card">
+                    <div>
+                        <div class="testimonial-stars">★★★★★</div>
+                        <p class="testimonial-quote">Pehle theory samajh nahi aati thi, lekin yahan ke chapter-wise notes aur mock tests ne mera COPA CBT exam bilkul aasaan kar diya. 92% marks aaye!</p>
+                    </div>
+                    <div class="testimonial-person">
+                        <div class="testimonial-avatar">GW</div>
+                        <div class="testimonial-info">
+                            <div class="name">Gaurav Warthe</div>
+                            <span class="trade-badge">COPA Trade</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div>
+                        <div class="testimonial-stars">★★★★★</div>
+                        <p class="testimonial-quote">Electronics ke circuits aur practicals ka step-by-step guide bahut helpful raha. Exam se pehle practice karke full confidence aa gaya tha mujhe.</p>
+                    </div>
+                    <div class="testimonial-person">
+                        <div class="testimonial-avatar">BB</div>
+                        <div class="testimonial-info">
+                            <div class="name">Bhagyawan Bhoyar</div>
+                            <span class="trade-badge">Electronics Trade</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div>
+                        <div class="testimonial-stars">★★★★★</div>
+                        <p class="testimonial-quote">Wiring aur safety ke topics ek dum clearly explain kiye hain. Daily quiz ne meri speed aur accuracy dono improve kar di. Best platform for ITI students!</p>
+                    </div>
+                    <div class="testimonial-person">
+                        <div class="testimonial-avatar">CM</div>
+                        <div class="testimonial-info">
+                            <div class="name">Chakradhar Mungale</div>
+                            <span class="trade-badge">Electrician Trade</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-bottom" id="register-cta-section">
+        <h2>CBT Exam aur Practical dono mein top karein!</h2>
+        <p>Aaj hi apna account banayein aur apni trade ki padhai shuru karein.</p>
+        <a href="apply.html">
+            <button class="btn btn-primary" style="padding: 15px 35px; font-size: 1.1rem; cursor: pointer;">
+                Register Now - It's Free
+            </button>
+        </a>
+    </section>
+
+    <footer>
+        <div>
+            <h4 style="color: #e53e3e; font-size: 1.3rem;">Learning Hub ITI</h4>
+            <p>Aapke sunhere bhavishya ke liye technical education ka sabse bharosemand platform.</p>
+        </div>
+        <div>
+            <h4>Trades</h4>
+            <ul>
+                <li><a href="copas.html">COPA Syllabus</a></li>
+                <li><a href="Electronics-s.html">Electronics Syllabus</a></li>
+                <li><a href="Electricians.html">Electrician Syllabus</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Study Material</h4>
+            <ul>
+                <li><a href="theorysyllabus.html">Theory Notes</a></li>
+                <li><a href="practical-guide.html">Practical Guides</a></li>
+                <li><a href="mocktest.html">Online Mock Test</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Help & Support</h4>
+            <ul>
+                <li><a href="contactus.html">Contact Us</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="Terms & Conditions.html">Terms & Conditions</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (localStorage.getItem("isRegistered") === "true") {
+                let registerSection = document.getElementById("register-cta-section");
+                if (registerSection) {
+                    registerSection.style.display = "none";
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

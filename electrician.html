@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrician Mock Test Engine - Complete</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+            position: relative; 
+        }
+
+        /* ---- NEW: Bottom Center Back Button Styling ---- */
+        .back-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .back-btn-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #f1c40f; /* Matched with your Electrician mock test buttons */
+            color: #333;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn-pro:hover {
+            background-color: #f39c12; 
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: translateY(-4px); /* Upward slide animation for center button */
+        }
+
+        .back-btn-pro svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        /* --------------------------------------------- */
+
+        .container { max-width: 900px; margin: 40px auto 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .btn { padding: 12px 20px; background-color: #f1c40f; color: #333; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; width: 100%; }
+        .btn:hover { background-color: #f39c12; color: white; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; color: white; }
+        .btn-success { background-color: #2ecc71; color: white; }
+        .btn-success:hover { background-color: #27ae60; }
+        
+        /* Quiz UI */
+        #timer-bar { display: flex; justify-content: space-between; align-items: center; background: #e74c3c; color: white; padding: 15px; border-radius: 5px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; margin-bottom: 20px;}
+        .question-card { background: #fafafa; padding: 20px; border-left: 5px solid #f1c40f; margin-bottom: 15px; border-radius: 4px; }
+        .question-card p { font-weight: bold; font-size: 16px; margin-top: 0; }
+        .options label { display: block; padding: 8px; cursor: pointer; background: #fff; border: 1px solid #ddd; margin-bottom: 8px; border-radius: 4px; }
+        .options label:hover { background: #f1f1f1; }
+        .options input { margin-right: 10px; }
+        
+        /* Results */
+        .result-box { text-align: center; padding: 30px; border: 2px dashed #bdc3c7; border-radius: 10px; margin-top: 20px; }
+        .pass { color: #2ecc71; font-weight: bold; font-size: 24px; }
+        .fail { color: #e74c3c; font-weight: bold; font-size: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #f1c40f; color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dashboard">
+        <h1>Electrician Mock Test Series</h1>
+        <p style="text-align: center;">10 Sets | 25 Questions Each | 30 Mins per Set | Passing: 50%</p>
+        <div class="grid" id="set-buttons">
+            </div>
+        <br>
+        <button class="btn btn-success" onclick="showOverallResult()">View Final Overall Result</button>
+    </div>
+
+    <div id="test-view" style="display: none;">
+        <div id="timer-bar">
+            <span id="set-title">Set 1</span>
+            <span>Time Left: <span id="time-display">30:00</span></span>
+        </div>
+        <div id="questions-container"></div>
+        <br>
+        <button class="btn btn-success" onclick="manualSubmit()">Submit Test</button>
+    </div>
+
+    <div id="result-view" style="display: none;">
+        <h2>Test Completed</h2>
+        <div class="result-box" id="result-details"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+
+    <div id="overall-view" style="display: none;">
+        <h2>Final Overall Results</h2>
+        <div id="overall-table-container"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+</div>
+
+<!-- NEW: Bottom Center Back Button Here -->
+<div class="back-wrapper">
+    <a href="javascript:history.back()" class="back-btn-pro">
+        <svg viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+        </svg>
+        Return To Home Page
+    </a>
+</div>
+
+<script>
+    // --- FULL 10-SET ELECTRICIAN DATABASE ---
+    const testData = {
+        1: [
+            { q: "What is the SI unit of electric current?", options: ["A) Volt", "B) Ohm", "C) Ampere", "D) Watt"], ans: 2 },
+            { q: "Which instrument is used to measure insulation resistance?", options: ["A) Voltmeter", "B) Multimeter", "C) Megger", "D) Ammeter"], ans: 2 },
+            { q: "What is the standard color code for the Earth wire in a single-phase AC circuit?", options: ["A) Red", "B) Black", "C) Green", "D) Yellow"], ans: 2 },
+            { q: "Which of the following represents Ohm's Law?", options: ["A) I = VR", "B) V = I/R", "C) V = IR", "D) R = VI"], ans: 2 },
+            { q: "What form of energy is converted by an electric motor?", options: ["A) Mechanical to Electrical", "B) Electrical to Mechanical", "C) Heat to Electrical", "D) Electrical to Chemical"], ans: 1 },
+            { q: "What is the unit of real electric power?", options: ["A) Watt", "B) Volt-Ampere", "C) KVAR", "D) Joule"], ans: 0 },
+            { q: "What does MCB stand for in electrical wiring?", options: ["A) Main Circuit Breaker", "B) Miniature Circuit Breaker", "C) Molded Circuit Breaker", "D) Maximum Circuit Breaker"], ans: 1 },
+            { q: "What does a transformer step up or step down?", options: ["A) Frequency", "B) Power", "C) Voltage", "D) Resistance"], ans: 2 },
+            { q: "Which material is predominantly used for making electrical heater coils?", options: ["A) Copper", "B) Tungsten", "C) Nichrome", "D) Aluminum"], ans: 2 },
+            { q: "What does ELCB stand for?", options: ["A) Electrical Leakage Circuit Breaker", "B) Earth Leakage Circuit Breaker", "C) Electronic Line Circuit Breaker", "D) Earth Line Control Board"], ans: 1 },
+            { q: "Which device is used to convert AC (Alternating Current) to DC (Direct Current)?", options: ["A) Inverter", "B) Rectifier", "C) Transformer", "D) Chopper"], ans: 1 },
+            { q: "A capacitor stores energy in the form of:", options: ["A) A magnetic field", "B) An electric field", "C) Chemical energy", "D) Thermal energy"], ans: 1 },
+            { q: "An inductor stores energy in the form of:", options: ["A) A magnetic field", "B) An electric field", "C) Kinetic energy", "D) Potential energy"], ans: 0 },
+            { q: "What is the SI unit of electrical resistance?", options: ["A) Farad", "B) Henry", "C) Siemens", "D) Ohm"], ans: 3 },
+            { q: "What is the approximate specific gravity of a fully charged lead-acid battery?", options: ["A) 1.10", "B) 1.18", "C) 1.28", "D) 1.50"], ans: 2 },
+            { q: "In a parallel electrical circuit, which quantity remains constant across all branches?", options: ["A) Current", "B) Resistance", "C) Power", "D) Voltage"], ans: 3 },
+            { q: "In a series electrical circuit, which quantity remains the same through all components?", options: ["A) Voltage", "B) Current", "C) Power", "D) Resistance"], ans: 1 },
+            { q: "What is the unit of capacitance?", options: ["A) Coulomb", "B) Farad", "C) Tesla", "D) Weber"], ans: 1 },
+            { q: "A standard fuse wire is typically made of an alloy of:", options: ["A) Copper and Silver", "B) Zinc and Lead", "C) Lead and Tin", "D) Aluminum and Steel"], ans: 2 },
+            { q: "Fleming's Left-Hand Rule is used to find the direction of force in:", options: ["A) DC Generators", "B) DC Motors", "C) Transformers", "D) Alternators"], ans: 1 },
+            { q: "The core of a transformer is usually made of which material to reduce losses?", options: ["A) Cast iron", "B) Silicon steel", "C) Pure copper", "D) Aluminum"], ans: 1 },
+            { q: "What is the unit of luminous flux?", options: ["A) Candela", "B) Lux", "C) Lumen", "D) Foot-candle"], ans: 2 },
+            { q: "Which of the following metals is the best conductor of electricity?", options: ["A) Gold", "B) Copper", "C) Aluminum", "D) Silver"], ans: 3 },
+            { q: "What is the standard frequency of the AC power supply in India?", options: ["A) 50 Hz", "B) 60 Hz", "C) 110 Hz", "D) 220 Hz"], ans: 0 },
+            { q: "Which hand tool is specifically used to safely strip insulation from a wire?", options: ["A) Pliers", "B) Wire stripper", "C) Hack saw", "D) Chisel"], ans: 1 }
+        ],
+        2: [
+            { q: "What is the working principle of a transformer?", options: ["A) Self-induction", "B) Mutual induction", "C) Electromagnetism", "D) Static induction"], ans: 1 },
+            { q: "Which type of fire extinguisher is best suited for electrical fires?", options: ["A) Water-based", "B) Foam-based", "C) Halon / CO2", "D) Wet chemical"], ans: 2 },
+            { q: "Which type of DC generator is most commonly used for arc welding?", options: ["A) Series generator", "B) Shunt generator", "C) Cumulative compound generator", "D) Differential compound generator"], ans: 3 },
+            { q: "What is the SI unit of magnetic flux?", options: ["A) Tesla", "B) Weber", "C) Gauss", "D) Oersted"], ans: 1 },
+            { q: "The rotating part of a DC machine is called the:", options: ["A) Stator", "B) Field winding", "C) Armature", "D) Yoke"], ans: 2 },
+            { q: "In a DC generator, the commutator is used to:", options: ["A) Reduce sparking", "B) Provide structural support", "C) Convert AC induced in the armature to DC output", "D) Increase the voltage"], ans: 2 },
+            { q: "Which starter is commonly used for a 3-phase squirrel cage induction motor up to 5 HP?", options: ["A) Star-Delta starter", "B) Auto-transformer starter", "C) DOL (Direct On Line) starter", "D) Rotor resistance starter"], ans: 2 },
+            { q: "What is the formula to calculate the synchronous speed (Ns) of an AC motor?", options: ["A) Ns = 120P/f", "B) Ns = 120f/P", "C) Ns = fP/120", "D) Ns = 120/fP"], ans: 1 },
+            { q: "The dielectric strength of transformer oil is generally measured in:", options: ["A) kV/mm", "B) V/m", "C) A/cm", "D) W/m"], ans: 0 },
+            { q: "Which DC motor has the highest starting torque?", options: ["A) Shunt Motor", "B) Series Motor", "C) Cumulative Compound Motor", "D) Differential Compound Motor"], ans: 1 },
+            { q: "What is the slip of an induction motor at standstill (when the rotor is stationary)?", options: ["A) 0", "B) 0.5", "C) 1", "D) Infinity"], ans: 2 },
+            { q: "What is the form factor of a pure sine wave?", options: ["A) 1.00", "B) 1.11", "C) 1.414", "D) 1.732"], ans: 1 },
+            { q: "Which instrument is used to measure electrical energy consumption in a household?", options: ["A) Wattmeter", "B) Voltmeter", "C) Energy meter (kWh meter)", "D) Galvanometer"], ans: 2 },
+            { q: "Alternators (AC Generators) are typically rated in:", options: ["A) kW", "B) kVA", "C) kVAR", "D) HP"], ans: 1 },
+            { q: "An open-circuit test on a transformer is conducted to determine:", options: ["A) Copper losses", "B) Core / Iron losses", "C) Total resistance", "D) Insulation resistance"], ans: 1 },
+            { q: "A short-circuit test on a transformer is conducted to determine:", options: ["A) Copper losses", "B) Core / Iron losses", "C) Dielectric strength", "D) Magnetic leakage"], ans: 0 },
+            { q: "What is the standard unit of self-inductance?", options: ["A) Farad", "B) Ohm", "C) Henry", "D) Siemens"], ans: 2 },
+            { q: "Battery capacity is typically expressed in:", options: ["A) Volts (V)", "B) Watts (W)", "C) Ampere-hours (Ah)", "D) Joules (J)"], ans: 2 },
+            { q: "What is the value of the power factor for a pure resistive circuit?", options: ["A) 0", "B) 0.5", "C) 0.8", "D) 1 (Unity)"], ans: 3 },
+            { q: "What is the value of the power factor for a pure inductive circuit?", options: ["A) 1", "B) 0.5 leading", "C) 0 (Zero lagging)", "D) 0.8 lagging"], ans: 2 },
+            { q: "The bit of a soldering iron is usually made of:", options: ["A) Iron", "B) Copper", "C) Aluminum", "D) Steel"], ans: 1 },
+            { q: "Illuminance (the amount of light hitting a surface) is measured in:", options: ["A) Lumen", "B) Candela", "C) Lux", "D) Watt"], ans: 2 },
+            { q: "Which material is primarily used for manufacturing solar cells?", options: ["A) Carbon", "B) Silicon", "C) Germanium", "D) Gallium"], ans: 1 },
+            { q: "An electrical inverter is a device that converts:", options: ["A) AC to DC", "B) High voltage to low voltage", "C) Low voltage to high voltage", "D) DC to AC"], ans: 3 },
+            { q: "In magnetic circuits, permeance is analogous to which property in electrical circuits?", options: ["A) Resistance", "B) Conductance", "C) Current", "D) Voltage"], ans: 1 }
+        ],
+        3: [
+            { q: "What is the function of a choke in a fluorescent tube circuit?", options: ["A) To heat the filaments", "B) To induce a high starting voltage and limit the running current", "C) To convert AC to DC", "D) To improve the power factor"], ans: 1 },
+            { q: "What is the active material of the positive plate in a fully charged lead-acid battery?", options: ["A) Spongy lead", "B) Lead sulfate", "C) Lead dioxide (PbO2)", "D) Sulfuric acid"], ans: 2 },
+            { q: "Which type of electrical wiring is best suited for temporary installations?", options: ["A) Conduit wiring", "B) Cleat wiring", "C) Casing and capping", "D) CTS wiring"], ans: 1 },
+            { q: "Two-way switches are primarily used in which type of wiring application?", options: ["A) Godown wiring", "B) Staircase wiring", "C) Hostel wiring", "D) Tunnel wiring"], ans: 1 },
+            { q: "What is the approximate resistance of the human body under dry skin conditions?", options: ["A) 1,000 Ohms", "B) 10,000 Ohms", "C) 100,000 Ohms", "D) 1,000,000 Ohms"], ans: 2 },
+            { q: "What is the main constituent of biogas used for power generation?", options: ["A) Carbon dioxide", "B) Methane", "C) Hydrogen", "D) Nitrogen"], ans: 1 },
+            { q: "Equipment earthing is necessary to provide protection against:", options: ["A) Voltage fluctuations", "B) Overloading", "C) Electric shock to operators", "D) High ambient temperatures"], ans: 2 },
+            { q: "Which rule is used to determine the direction of induced EMF in a DC generator?", options: ["A) Fleming's Left-Hand Rule", "B) Fleming's Right-Hand Rule", "C) Ampere's Rule", "D) Maxwell's Corkscrew Rule"], ans: 1 },
+            { q: "What type of rotor is used in high-speed steam-turbine driven alternators?", options: ["A) Salient pole rotor", "B) Squirrel cage rotor", "C) Wound rotor", "D) Cylindrical (non-salient pole) rotor"], ans: 3 },
+            { q: "What is the primary purpose of interpoles in a DC machine?", options: ["A) To increase the main magnetic flux", "B) To reduce sparking at the commutator", "C) To regulate motor speed", "D) To support the armature"], ans: 1 },
+            { q: "Magnetic reluctance is inversely proportional to the material's:", options: ["A) Length", "B) Area", "C) Permeability", "D) Conductivity"], ans: 2 },
+            { q: "The RMS (Root Mean Square) value of a sinusoidal wave is equal to:", options: ["A) 0.637 x Peak value", "B) 0.707 x Peak value", "C) 1.11 x Peak value", "D) 1.414 x Peak value"], ans: 1 },
+            { q: "In a balanced 3-phase star connection, the relationship between line voltage (VL) and phase voltage (Vph) is:", options: ["A) VL = Vph", "B) VL = 3 x Vph", "C) VL = √3 x Vph", "D) VL = Vph / √3"], ans: 2 },
+            { q: "In a balanced 3-phase delta connection, the relationship between line current (IL) and phase current (Iph) is:", options: ["A) IL = Iph", "B) IL = √3 x Iph", "C) IL = 3 x Iph", "D) IL = Iph / √3"], ans: 1 },
+            { q: "What is the unit of electrical admittance?", options: ["A) Ohm", "B) Farad", "C) Henry", "D) Siemens (Mho)"], ans: 3 },
+            { q: "What is the primary function of an electrical fuse?", options: ["A) To prevent voltage drops", "B) To protect the circuit from overcurrent/short circuits", "C) To regulate power supply", "D) To improve power factor"], ans: 1 },
+            { q: "A Scott connection of transformers is used to convert:", options: ["A) Single-phase to 3-phase", "B) 3-phase to single-phase", "C) 3-phase to 2-phase", "D) AC to DC"], ans: 2 },
+            { q: "A Buchholz relay is a gas-actuated relay used for the protection of:", options: ["A) Oil-immersed Transformers", "B) Alternators", "C) Transmission lines", "D) Induction motors"], ans: 0 },
+            { q: "What is the color of silica gel in a transformer breather when it is fresh and dry?", options: ["A) Pink", "B) White", "C) Blue", "D) Green"], ans: 2 },
+            { q: "Which speed control method is commonly used for universal motors (like in mixer grinders)?", options: ["A) Pole changing method", "B) Frequency control", "C) Variable resistance / Phase angle control", "D) Voltage injection method"], ans: 2 },
+            { q: "A Megger test instrument is fundamentally a combination of:", options: ["A) A hand-driven DC generator and an ohmmeter", "B) A battery and a voltmeter", "C) An AC generator and an ammeter", "D) A transformer and a galvanometer"], ans: 0 },
+            { q: "What is the standard unit of a solid angle in illumination engineering?", options: ["A) Radian", "B) Degree", "C) Steradian", "D) Candela"], ans: 2 },
+            { q: "In which electrical instrument is 'creeping error' commonly observed?", options: ["A) Voltmeter", "B) Ammeter", "C) Electrodynamometer", "D) Energy meter"], ans: 3 },
+            { q: "According to electrical standards, Class 'C' insulation can withstand temperatures up to:", options: ["A) 90°C", "B) 105°C", "C) 155°C", "D) Above 180°C"], ans: 3 },
+            { q: "What is the peak factor (crest factor) of a pure sinusoidal alternating wave?", options: ["A) 1.11", "B) 1.414", "C) 1.732", "D) 2.0"], ans: 1 }
+        ],
+        4: [
+            { q: "Which type of wiring is highly suitable for workshops and highly flammable places?", options: ["A) Cleat wiring", "B) Casing-capping wiring", "C) CTS wiring", "D) Conduit wiring"], ans: 3 },
+            { q: "What is the standard length of the pipe used for pipe earthing as per IE rules?", options: ["A) 1.5 meters", "B) 2.0 meters", "C) 2.5 meters", "D) 3.0 meters"], ans: 2 },
+            { q: "The rating of a fuse wire is always expressed in:", options: ["A) Volts", "B) Amperes", "C) Ampere-hours", "D) Watts"], ans: 1 },
+            { q: "What does HRC stand for in electrical fuses?", options: ["A) High Resistance Conductor", "B) High Rupturing Capacity", "C) Heavy Relay Contact", "D) High Rating Current"], ans: 1 },
+            { q: "In a single-phase motor, the capacitor is connected in:", options: ["A) Series with the starting winding", "B) Parallel with the starting winding", "C) Series with the running winding", "D) Parallel with the running winding"], ans: 0 },
+            { q: "Which instrument is used for measuring the RPM of a rotating machine?", options: ["A) Tachometer", "B) Galvanometer", "C) Hydrometer", "D) Pyrometer"], ans: 0 },
+            { q: "What is the primary function of a commutator in a DC generator?", options: ["A) To provide structural support", "B) To convert alternating current (AC) to direct current (DC)", "C) To reduce friction", "D) To increase the magnetic field"], ans: 1 },
+            { q: "What is the permissible voltage drop in a lighting circuit as per IE rules?", options: ["A) 2% of declared supply voltage", "B) 3% of declared supply voltage", "C) 5% of declared supply voltage", "D) 10% of declared supply voltage"], ans: 1 },
+            { q: "The direction of rotation of a 3-phase induction motor can be reversed by:", options: ["A) Changing the supply frequency", "B) Reversing any two supply phases", "C) Reducing the supply voltage", "D) Connecting a capacitor in series"], ans: 1 },
+            { q: "What is the unit of Specific Resistance (Resistivity)?", options: ["A) Ohm", "B) Ohm/meter", "C) Ohm-meter", "D) Mho"], ans: 2 },
+            { q: "Which artificial respiration method is preferred for a victim with chest injuries?", options: ["A) Holger-Nielsen method", "B) Schafer's method", "C) Mouth-to-mouth method", "D) Sylvester's method"], ans: 1 },
+            { q: "The material used for making the heating element of an electric iron is:", options: ["A) Copper", "B) Silver", "C) Nichrome", "D) Tungsten"], ans: 2 },
+            { q: "The back EMF of a DC motor:", options: ["A) Aids the applied voltage", "B) Opposes the applied voltage", "C) Does not affect the applied voltage", "D) Is always zero"], ans: 1 },
+            { q: "In a lead-acid battery, the electrolyte used is:", options: ["A) Dilute Hydrochloric acid", "B) Dilute Sulfuric acid", "C) Nitric acid", "D) Potassium hydroxide"], ans: 1 },
+            { q: "The illumination level required for precision work (like watchmaking) is roughly:", options: ["A) 50 lumens/m²", "B) 100 lumens/m²", "C) 500 lumens/m²", "D) 1000+ lumens/m²"], ans: 3 },
+            { q: "Which type of joint is preferred for overhead lines where high tensile strength is needed?", options: ["A) Britannia joint", "B) Married joint", "C) Rat-tail joint", "D) Tee joint"], ans: 0 },
+            { q: "A step-up transformer increases the:", options: ["A) Power", "B) Frequency", "C) Voltage", "D) Current"], ans: 2 },
+            { q: "For domestic wiring, the minimum cross-sectional area of copper wire used for sub-circuits should be:", options: ["A) 0.5 sq. mm", "B) 1.0 sq. mm", "C) 1.5 sq. mm", "D) 2.5 sq. mm"], ans: 1 },
+            { q: "What is the speed of a 4-pole, 50 Hz synchronous machine?", options: ["A) 1000 RPM", "B) 1200 RPM", "C) 1500 RPM", "D) 3000 RPM"], ans: 2 },
+            { q: "The function of a capacitor in a fluorescent tube circuit is to:", options: ["A) Provide high starting voltage", "B) Limit the running current", "C) Improve the power factor", "D) Produce the arc"], ans: 2 },
+            { q: "In a transformer, the winding with fewer turns is the:", options: ["A) Primary winding", "B) Secondary winding", "C) Low voltage (LV) winding", "D) High voltage (HV) winding"], ans: 2 },
+            { q: "Which material is used to absorb moisture from the air entering a transformer?", options: ["A) Silica gel", "B) Calcium chloride", "C) Sodium chloride", "D) Activated carbon"], ans: 0 },
+            { q: "A universal motor can run on:", options: ["A) Only AC supply", "B) Only DC supply", "C) Both AC and DC supplies", "D) Battery supply only"], ans: 2 },
+            { q: "What is the normal operating temperature range of a soldering iron?", options: ["A) 50°C - 100°C", "B) 100°C - 150°C", "C) 200°C - 300°C", "D) 400°C - 500°C"], ans: 2 },
+            { q: "Which tool is used to make pilot holes in wood before driving screws?", options: ["A) Try square", "B) Bradawl (Poker)", "C) Mallet", "D) Chisel"], ans: 1 }
+        ],
+        5: [
+            { q: "What is the function of the starter in a fluorescent tube lamp?", options: ["A) To improve power factor", "B) To limit the steady current", "C) To break the circuit initially to induce high voltage", "D) To convert AC to DC"], ans: 2 },
+            { q: "Which color wire is used for the Neutral connection in a 3-phase AC system?", options: ["A) Red", "B) Yellow", "C) Blue", "D) Black"], ans: 3 },
+            { q: "The condition of a fully discharged lead-acid cell is indicated by a specific gravity of:", options: ["A) 1.140", "B) 1.200", "C) 1.260", "D) 1.280"], ans: 0 },
+            { q: "Lenz's law is a consequence of the law of conservation of:", options: ["A) Mass", "B) Charge", "C) Energy", "D) Momentum"], ans: 2 },
+            { q: "Which type of DC motor is used for electric traction (e.g., trains)?", options: ["A) DC Shunt Motor", "B) DC Series Motor", "C) DC Differential Compound Motor", "D) DC Cumulative Compound Motor"], ans: 1 },
+            { q: "What happens to the current in a pure capacitive circuit?", options: ["A) Current lags voltage by 90°", "B) Current leads voltage by 90°", "C) Current and voltage are in phase", "D) Current lags voltage by 45°"], ans: 1 },
+            { q: "What is the SI unit of magnetic flux density?", options: ["A) Weber", "B) Tesla", "C) Henry", "D) Ampere/meter"], ans: 1 },
+            { q: "Which device converts solar energy directly into electrical energy?", options: ["A) Photo-voltaic cell", "B) Dynamo", "C) Fuel cell", "D) Battery"], ans: 0 },
+            { q: "A 3-phase, 4-wire system is commonly used for:", options: ["A) Primary transmission", "B) Secondary transmission", "C) Primary distribution", "D) Secondary distribution"], ans: 3 },
+            { q: "What is the formula for calculating electrical power in a DC circuit?", options: ["A) P = V / I", "B) P = V x I", "C) P = I² / R", "D) P = V² x R"], ans: 1 },
+            { q: "The unit of electrical conductance is:", options: ["A) Ohm", "B) Volt", "C) Siemens (Mho)", "D) Ampere"], ans: 2 },
+            { q: "In a moving coil instrument, the deflecting torque is proportional to:", options: ["A) The voltage", "B) The square of the current", "C) The current", "D) The resistance"], ans: 2 },
+            { q: "The process of charging a battery at a very low rate for a long time is called:", options: ["A) Boost charging", "B) Float charging", "C) Trickle charging", "D) Initial charging"], ans: 2 },
+            { q: "What is the function of the breather in a transformer?", options: ["A) To cool the transformer oil", "B) To arrest the flow of current", "C) To extract moisture from the air entering the conservator", "D) To measure the oil level"], ans: 2 },
+            { q: "Which motor does not have a commutator, brushes, or slip rings?", options: ["A) DC Series Motor", "B) DC Shunt Motor", "C) Slip Ring Induction Motor", "D) Squirrel Cage Induction Motor"], ans: 3 },
+            { q: "The power factor of a purely resistive circuit is:", options: ["A) Zero", "B) 0.5", "C) 0.8", "D) Unity (1)"], ans: 3 },
+            { q: "What is the operating voltage of an ordinary dry cell?", options: ["A) 1.2 V", "B) 1.5 V", "C) 2.0 V", "D) 3.0 V"], ans: 1 },
+            { q: "According to IE rules, what is the maximum load permitted on a single lighting sub-circuit?", options: ["A) 500 Watts or 5 points", "B) 800 Watts or 10 points", "C) 1000 Watts or 15 points", "D) 3000 Watts or 2 points"], ans: 1 },
+            { q: "What is the typical use of a 'Crimping Tool'?", options: ["A) Cutting steel wires", "B) Measuring wire gauge", "C) Pressing lugs/thimbles onto the ends of wires", "D) Stripping insulation"], ans: 2 },
+            { q: "Which insulating material is classified as Class E?", options: ["A) Cotton", "B) Leatheroid", "C) Mica", "D) Asbestos"], ans: 1 },
+            { q: "Which connection is typically used in the distribution transformer secondary to provide household power?", options: ["A) Star-Star", "B) Delta-Delta", "C) Delta-Star", "D) Star-Delta"], ans: 2 },
+            { q: "How are residential loads connected in the power system?", options: ["A) In Series", "B) In Parallel", "C) In Star", "D) In Cascade"], ans: 1 },
+            { q: "What is the most common material used for electrical overhead transmission lines?", options: ["A) Pure copper", "B) ACSR (Aluminum Conductor Steel Reinforced)", "C) Galvanized Iron", "D) Brass"], ans: 1 },
+            { q: "What type of bearing is generally used in small induction motors?", options: ["A) Roller bearing", "B) Ball bearing", "C) Thrust bearing", "D) Sleeve bearing"], ans: 1 },
+            { q: "What does AWG stand for in relation to electrical wires?", options: ["A) American Wire Gauge", "B) Aluminum Wire Grade", "C) Standard Wire Gauge", "D) Alternating Wire Grid"], ans: 0 }
+        ],
+        6: [
+            { q: "What is the maximum permissible distance between two consecutive cleats in cleat wiring?", options: ["A) 30 cm", "B) 60 cm", "C) 100 cm", "D) 150 cm"], ans: 1 },
+            { q: "What type of rotor is found in a ceiling fan motor?", options: ["A) Wound rotor", "B) Salient pole rotor", "C) Squirrel cage rotor", "D) Commutator rotor"], ans: 2 },
+            { q: "Which instrument is specifically used for measuring very high electrical resistance?", options: ["A) Ohmmeter", "B) Megger", "C) Earth Tester", "D) Multimeter"], ans: 1 },
+            { q: "An alternator operates on the principle of:", options: ["A) Electrostatic induction", "B) Electromagnetic induction", "C) Mutual induction", "D) Self-induction"], ans: 1 },
+            { q: "If the slip of an induction motor becomes zero, the motor will:", options: ["A) Run at synchronous speed", "B) Stop completely", "C) Burn out", "D) Run at dangerously high speed"], ans: 0 },
+            { q: "What is the frequency of DC supply?", options: ["A) 0 Hz", "B) 50 Hz", "C) 60 Hz", "D) Infinite"], ans: 0 },
+            { q: "The 'Skin Effect' causes current to flow:", options: ["A) Through the center of the conductor", "B) Near the surface of the conductor", "C) Uniformly throughout the conductor", "D) Only in insulators"], ans: 1 },
+            { q: "Which gas is commonly filled in modern incandescent lamps to prevent filament oxidation?", options: ["A) Oxygen", "B) Hydrogen", "C) Argon or Nitrogen", "D) Chlorine"], ans: 2 },
+            { q: "What is the primary cause of a 'Short Circuit'?", options: ["A) Phase wire touching the neutral or earth wire directly", "B) Voltage drop across a long wire", "C) Too many appliances on a board", "D) Loose connections"], ans: 0 },
+            { q: "What does 'SWG' stand for?", options: ["A) Standard Wire Gauge", "B) Solid Wire Grade", "C) System Wire Grid", "D) Secondary Wire Ground"], ans: 0 },
+            { q: "To increase the voltage rating, batteries should be connected in:", options: ["A) Parallel", "B) Series", "C) Star", "D) Delta"], ans: 1 },
+            { q: "To increase the current capacity, batteries should be connected in:", options: ["A) Parallel", "B) Series", "C) Star", "D) Delta"], ans: 0 },
+            { q: "Which type of motor is used in food mixers?", options: ["A) Shaded pole motor", "B) Capacitor start motor", "C) Universal motor", "D) Repulsion motor"], ans: 2 },
+            { q: "The insulating oil inside a transformer serves the dual purpose of:", options: ["A) Lubrication and insulation", "B) Cooling and lubrication", "C) Cooling and insulation", "D) Heating and insulation"], ans: 2 },
+            { q: "What is the equivalent resistance of two 100-ohm resistors connected in parallel?", options: ["A) 50 ohms", "B) 100 ohms", "C) 200 ohms", "D) 400 ohms"], ans: 0 },
+            { q: "What is the equivalent resistance of two 100-ohm resistors connected in series?", options: ["A) 50 ohms", "B) 100 ohms", "C) 200 ohms", "D) 400 ohms"], ans: 2 },
+            { q: "Which class of fire involves flammable liquids like petrol and oil?", options: ["A) Class A", "B) Class B", "C) Class C", "D) Class D"], ans: 1 },
+            { q: "What device converts mechanical energy into DC electrical energy?", options: ["A) Alternator", "B) DC Generator", "C) DC Motor", "D) Transformer"], ans: 1 },
+            { q: "What type of connection is required to make a delta network?", options: ["A) End to end forming a closed loop", "B) All starting ends connected to a common neutral point", "C) Alternating series connections", "D) Star configuration"], ans: 0 },
+            { q: "The core of a DC armature is laminated to minimize:", options: ["A) Copper loss", "B) Friction loss", "C) Eddy current loss", "D) Hysteresis loss"], ans: 2 },
+            { q: "Which test is used to locate earth faults and short circuits in underground cables?", options: ["A) Murray loop test", "B) Open circuit test", "C) Blocked rotor test", "D) Megger test"], ans: 0 },
+            { q: "In a capacitor-start, capacitor-run single-phase motor, how many capacitors are used?", options: ["A) 1", "B) 2", "C) 3", "D) None"], ans: 1 },
+            { q: "Which active component controls the flow of current in electronic circuits?", options: ["A) Resistor", "B) Capacitor", "C) Inductor", "D) Transistor"], ans: 3 },
+            { q: "What is the function of an ammeter shunt?", options: ["A) To increase the voltage range", "B) To increase the current measuring range", "C) To protect the meter from dust", "D) To decrease the current measuring range"], ans: 1 },
+            { q: "According to IE rules, the leakage current in an installation should not exceed what fraction of the maximum full load current?", options: ["A) 1/1000", "B) 1/2000", "C) 1/5000", "D) 1/10000"], ans: 2 }
+        ],
+        7: [
+            { q: "Which of the following is NOT a part of a standard Lead-Acid battery?", options: ["A) Positive plate", "B) Separator", "C) Electrolyte", "D) Carbon brush"], ans: 3 },
+            { q: "If the cross-sectional area of a wire is doubled, its resistance will:", options: ["A) Double", "B) Quadruple", "C) Halve", "D) Remain unchanged"], ans: 2 },
+            { q: "The property of a material that opposes the creation of magnetic flux is called:", options: ["A) Resistance", "B) Reluctance", "C) Permeance", "D) Inductance"], ans: 1 },
+            { q: "In a 3-phase induction motor, the difference between synchronous speed and actual rotor speed is called:", options: ["A) Regulation", "B) Lag", "C) Slip", "D) Drift"], ans: 2 },
+            { q: "A diode is a device that allows current to flow in:", options: ["A) Both directions", "B) Only one direction", "C) Random directions", "D) It completely blocks current"], ans: 1 },
+            { q: "What is the purpose of the Earth pin on a 3-pin plug being thicker and longer than the other pins?", options: ["A) To save brass material", "B) To make the earth connection first before live connections", "C) To carry more voltage", "D) For aesthetic design"], ans: 1 },
+            { q: "What does PMCC stand for in motor control systems?", options: ["A) Power Motor Control Center", "B) Primary Motor Control Center", "C) Power Management Control Center", "D) Phase Motor Control Circuit"], ans: 0 },
+            { q: "A dynamometer type instrument can be used to measure:", options: ["A) AC only", "B) DC only", "C) Both AC and DC", "D) Pulsating DC only"], ans: 2 },
+            { q: "The working principle of a permanent magnet moving coil (PMMC) instrument is based on:", options: ["A) Heating effect of current", "B) Electromagnetic effect", "C) Electrostatic effect", "D) Chemical effect"], ans: 1 },
+            { q: "Which part of a DC machine prevents mechanical damage to the winding and provides a path for magnetic flux?", options: ["A) Commutator", "B) Yoke (Frame)", "C) Armature", "D) Brushes"], ans: 1 },
+            { q: "Which method of earthing is most commonly used in rocky areas?", options: ["A) Pipe earthing", "B) Plate earthing", "C) Strip / Wire earthing", "D) Rod earthing"], ans: 2 },
+            { q: "When measuring insulation resistance with a Megger, the test voltage used for a 240V domestic installation is usually:", options: ["A) 100V DC", "B) 500V DC", "C) 1000V AC", "D) 250V AC"], ans: 1 },
+            { q: "A stepper motor rotates in:", options: ["A) Continuous smooth motion", "B) Discrete steps or angles", "C) High-speed bursts", "D) Reverse direction only"], ans: 1 },
+            { q: "Which logic gate outputs a HIGH (1) only if both its inputs are HIGH (1)?", options: ["A) OR Gate", "B) NOR Gate", "C) AND Gate", "D) XOR Gate"], ans: 2 },
+            { q: "The material commonly used to make brushes for a DC machine is:", options: ["A) Copper", "B) Carbon", "C) Aluminum", "D) Steel"], ans: 1 },
+            { q: "An electric iron consumes 1000W when connected to a 250V supply. What is the current flowing through it?", options: ["A) 2A", "B) 4A", "C) 5A", "D) 10A"], ans: 1 },
+            { q: "If three 10 μF capacitors are connected in parallel, the total capacitance is:", options: ["A) 3.33 μF", "B) 10 μF", "C) 30 μF", "D) 100 μF"], ans: 2 },
+            { q: "The color of the Live (Phase) wire in older traditional Indian color coding was:", options: ["A) Red", "B) Black", "C) Green", "D) White"], ans: 0 },
+            { q: "A Wheatstone bridge is used for the precise measurement of:", options: ["A) High Voltage", "B) Low to medium Resistance", "C) High Current", "D) Power Factor"], ans: 1 },
+            { q: "Which starter is used for DC shunt motors?", options: ["A) 2-point starter", "B) 3-point or 4-point starter", "C) DOL starter", "D) Star-Delta starter"], ans: 1 },
+            { q: "The total flux generated by a light source in all directions is measured in:", options: ["A) Lux", "B) Foot-candles", "C) Lumens", "D) Candelas"], ans: 2 },
+            { q: "Which tool is used to check the right angle (90 degrees) of wooden boards during electrical batten wiring?", options: ["A) Plumb bob", "B) Try square", "C) Mallet", "D) Spirit level"], ans: 1 },
+            { q: "What does VFD stand for in industrial motor control?", options: ["A) Variable Frequency Drive", "B) Voltage Fluctuating Device", "C) Variable Force Drive", "D) Volumetric Flow Drive"], ans: 0 },
+            { q: "In a step-down transformer, the secondary current is:", options: ["A) Less than the primary current", "B) Equal to the primary current", "C) Greater than the primary current", "D) Zero"], ans: 2 },
+            { q: "Which device protects a circuit from overload and short circuit and can be reset easily after tripping?", options: ["A) Fuse", "B) Isolator switch", "C) MCB (Miniature Circuit Breaker)", "D) RCCB"], ans: 2 }
+        ],
+        8: [
+            { q: "The rotating magnetic field in a 3-phase induction motor revolves at:", options: ["A) Rotor speed", "B) Slip speed", "C) Synchronous speed", "D) Zero speed"], ans: 2 },
+            { q: "Which law states that the current passing through a conductor is directly proportional to the voltage applied across it, provided temperature remains constant?", options: ["A) Faraday's Law", "B) Ampere's Law", "C) Ohm's Law", "D) Coulomb's Law"], ans: 2 },
+            { q: "What is the formula for calculating total resistance (Rt) when two resistors (R1 and R2) are in series?", options: ["A) Rt = (R1*R2)/(R1+R2)", "B) Rt = R1 + R2", "C) Rt = 1/R1 + 1/R2", "D) Rt = R1 - R2"], ans: 1 },
+            { q: "What causes heating in electrical conductors when current passes through them?", options: ["A) Voltage", "B) Magnetic field", "C) Resistance", "D) Capacitance"], ans: 2 },
+            { q: "To measure voltage, a voltmeter should be connected in:", options: ["A) Series with the load", "B) Parallel with the load", "C) Either series or parallel", "D) Direct contact with earth"], ans: 1 },
+            { q: "To measure current, an ammeter should be connected in:", options: ["A) Parallel with the load", "B) Series with the load", "C) Across the power supply", "D) Direct contact with earth"], ans: 1 },
+            { q: "What is the function of charcoal and salt in a pipe earthing pit?", options: ["A) To prevent corrosion of the pipe", "B) To increase soil resistance", "C) To retain moisture and lower earth resistance", "D) To act as an insulator"], ans: 2 },
+            { q: "A neon tester is typically used to detect the presence of:", options: ["A) High DC voltage", "B) Phase/Live AC voltage", "C) Current magnitude", "D) Neutral line fault"], ans: 1 },
+            { q: "The term 'PCB' in electronics/electrical boards stands for:", options: ["A) Primary Circuit Breaker", "B) Printed Circuit Board", "C) Power Control Block", "D) Phase Current Balancer"], ans: 1 },
+            { q: "A 5-pin industrial socket usually has connections for:", options: ["A) L1, L2, L3, Neutral, Earth", "B) Phase, Neutral, Earth, Ground, Shield", "C) L1, L2, Neutral, Switch 1, Switch 2", "D) High, Medium, Low, Neutral, Earth"], ans: 0 },
+            { q: "A device used to convert mechanical rotational energy directly into electrical energy is called a:", options: ["A) Motor", "B) Generator", "C) Transformer", "D) Solenoid"], ans: 1 },
+            { q: "The internal resistance of an ideal voltmeter is:", options: ["A) Zero", "B) Very low", "C) Infinite", "D) 100 Ohms"], ans: 2 },
+            { q: "The internal resistance of an ideal ammeter is:", options: ["A) Zero", "B) Very high", "C) Infinite", "D) 100 Ohms"], ans: 0 },
+            { q: "Which device is triggered into conduction by a small gate current and continues to conduct until current drops to zero?", options: ["A) Transistor", "B) Diode", "C) SCR (Thyristor)", "D) Zener diode"], ans: 2 },
+            { q: "Which tool is best for cutting heavy electrical cables?", options: ["A) Side-cutting pliers", "B) Cable cutter / shears", "C) Wire stripper", "D) Hacksaw"], ans: 1 },
+            { q: "The starting torque of a capacitor-start single-phase motor is:", options: ["A) Zero", "B) Low", "C) High", "D) Negative"], ans: 2 },
+            { q: "What type of energy is stored in a lead-acid battery?", options: ["A) Thermal energy", "B) Chemical energy", "C) Kinetic energy", "D) Mechanical energy"], ans: 1 },
+            { q: "What is the purpose of the conservator tank on top of a power transformer?", options: ["A) To store spare oil", "B) To cool the oil", "C) To allow for expansion and contraction of the oil volume", "D) To purify the oil"], ans: 2 },
+            { q: "In residential electrical installations, switches must always be connected in the:", options: ["A) Neutral wire", "B) Earth wire", "C) Live / Phase wire", "D) Any wire"], ans: 2 },
+            { q: "A Zener diode is primarily used in circuits for:", options: ["A) Rectification", "B) Voltage regulation", "C) Amplification", "D) Oscillation"], ans: 1 },
+            { q: "What is the full form of UPS?", options: ["A) Uninterrupted Power Supply", "B) Universal Power Source", "C) Uniform Phase Supply", "D) Under Power System"], ans: 0 },
+            { q: "Which is the most common type of fault in underground cables?", options: ["A) Earth fault", "B) Short circuit fault", "C) Open circuit fault", "D) All of the above"], ans: 3 },
+            { q: "The speed of a squirrel cage induction motor is controlled by changing the:", options: ["A) Stator resistance", "B) Rotor resistance", "C) Supply frequency", "D) Carbon brushes"], ans: 2 },
+            { q: "In a house wiring layout, the recommended height for mounting a switchboard from the floor level is approximately:", options: ["A) 0.5 meters", "B) 1.3 to 1.5 meters", "C) 2.5 meters", "D) 3.0 meters"], ans: 1 },
+            { q: "An ohmmeter is a device that contains its own internal:", options: ["A) Generator", "B) Current coil", "C) Power source (Battery)", "D) Voltage transformer"], ans: 2 }
+        ],
+        9: [
+            { q: "Which of the following describes the function of a relay?", options: ["A) It generates power", "B) It is an electrically operated switch", "C) It converts AC to DC", "D) It limits voltage surges"], ans: 1 },
+            { q: "What happens if you connect a DC ammeter across a high voltage source directly in parallel?", options: ["A) It will measure the voltage accurately", "B) It will read zero", "C) It will act as a short circuit and burn out", "D) It will measure the internal resistance"], ans: 2 },
+            { q: "Which component is used to smooth out the pulsating DC coming from a rectifier circuit?", options: ["A) Inductor", "B) Transformer", "C) Capacitor", "D) Transistor"], ans: 2 },
+            { q: "What is the primary function of a 'Contactor' in a motor control circuit?", options: ["A) To step down voltage", "B) To make and break power circuits repeatedly", "C) To measure current", "D) To change motor frequency"], ans: 1 },
+            { q: "Which of the following lamps gives a nearly monochromatic (single color) yellow light?", options: ["A) Sodium Vapor Lamp", "B) Fluorescent Tube", "C) Mercury Vapor Lamp", "D) LED Bulb"], ans: 0 },
+            { q: "In the context of power factors, KVAR stands for:", options: ["A) Kilo-Volt-Amperes Rated", "B) Kilo-Volt-Amperes Reactive", "C) Kilo-Volts And Resistance", "D) Kinetic Voltage And Reactance"], ans: 1 },
+            { q: "Which class of insulation is rated for the highest operating temperature?", options: ["A) Class A", "B) Class E", "C) Class B", "D) Class C"], ans: 3 },
+            { q: "When working on live electrical circuits, an electrician should stand on:", options: ["A) A wet floor", "B) A metal ladder", "C) A rubber mat", "D) Bare concrete"], ans: 2 },
+            { q: "In a series circuit containing a 10 ohm, 20 ohm, and 30 ohm resistor, the total resistance is:", options: ["A) 10 ohms", "B) 30 ohms", "C) 60 ohms", "D) 5.45 ohms"], ans: 2 },
+            { q: "The process of joining two metals together using a filler metal (solder) that melts at a lower temperature than the base metals is called:", options: ["A) Welding", "B) Brazing", "C) Soldering", "D) Forging"], ans: 2 },
+            { q: "What is the typical output waveform of a DC generator before passing through the commutator?", options: ["A) Pure DC", "B) Pulsating DC", "C) Alternating Current (AC)", "D) Square wave"], ans: 2 },
+            { q: "The ability of a material to remain magnetized after the magnetizing force is removed is known as:", options: ["A) Permeability", "B) Reluctance", "C) Retentivity", "D) Susceptibility"], ans: 2 },
+            { q: "Which color indicates the protective earth conductor in modern international IEC standard wiring?", options: ["A) Red", "B) Black", "C) Green/Yellow stripe", "D) Blue"], ans: 2 },
+            { q: "What does the term 'MCB tripping' indicate?", options: ["A) The switch has broken", "B) A fault or overload condition has been detected", "C) The power company has cut the supply", "D) The device is fully charged"], ans: 1 },
+            { q: "What is the formula to calculate energy consumption in kilowatt-hours (kWh)?", options: ["A) (Watts x Hours) / 1000", "B) Watts x Hours x 1000", "C) Volts x Amps", "D) Watts / Hours"], ans: 0 },
+            { q: "The armature of a DC motor is laminated to:", options: ["A) Decrease its weight", "B) Reduce eddy current loss", "C) Reduce hysteresis loss", "D) Increase its structural strength"], ans: 1 },
+            { q: "Which tool is specifically designed for bending rigid PVC or metal conduits?", options: ["A) Pipe wrench", "B) Pliers", "C) Conduit bender (Hickey)", "D) Hacksaw"], ans: 2 },
+            { q: "According to standard safety practices, which extinguisher should NEVER be used on an electrical fire?", options: ["A) CO2 Extinguisher", "B) Dry Powder Extinguisher", "C) Water Extinguisher", "D) Halon Extinguisher"], ans: 2 },
+            { q: "What is the synchronous speed of a 2-pole, 50 Hz AC motor?", options: ["A) 1500 RPM", "B) 3000 RPM", "C) 3600 RPM", "D) 1000 RPM"], ans: 1 },
+            { q: "In a domestic refrigerator, which motor is typically used for the compressor?", options: ["A) DC Shunt Motor", "B) Universal Motor", "C) Single-phase induction motor", "D) Synchronous motor"], ans: 2 },
+            { q: "Which semiconductor material is most commonly used in making standard diodes and transistors?", options: ["A) Germanium", "B) Silicon", "C) Carbon", "D) Aluminum"], ans: 1 },
+            { q: "A Light Emitting Diode (LED) emits light when it is:", options: ["A) Reverse biased", "B) Forward biased", "C) Unbiased", "D) Heated"], ans: 1 },
+            { q: "What is the function of an electrical contactor's auxiliary contacts?", options: ["A) To carry the main motor current", "B) To provide interlocks and holding circuits", "C) To protect against short circuits", "D) To step down the voltage"], ans: 1 },
+            { q: "Which law is used to find the equivalent resistance of a complex network that cannot be simplified by series/parallel rules?", options: ["A) Lenz's Law", "B) Faraday's Law", "C) Kirchhoff's Laws", "D) Coulomb's Law"], ans: 2 },
+            { q: "To protect a sensitive circuit from high voltage transients, which component is wired in parallel across the line?", options: ["A) Series resistor", "B) Choke coil", "C) MOV (Metal Oxide Varistor)", "D) Thermal relay"], ans: 2 }
+        ],
+        10: [
+            { q: "The current capacity of a cable primarily depends on:", options: ["A) The length of the cable", "B) The cross-sectional area of the conductor", "C) The color of the insulation", "D) The operating voltage"], ans: 1 },
+            { q: "What is the unit of mutual inductance?", options: ["A) Farad", "B) Weber", "C) Tesla", "D) Henry"], ans: 3 },
+            { q: "A 3-phase induction motor with 6 poles running on a 50 Hz supply has a synchronous speed of:", options: ["A) 1000 RPM", "B) 1200 RPM", "C) 1500 RPM", "D) 3000 RPM"], ans: 0 },
+            { q: "What does the abbreviation 'RCCB' stand for?", options: ["A) Residual Current Circuit Breaker", "B) Reverse Current Control Board", "C) Rated Capacity Circuit Breaker", "D) Resistance Controlled Circuit Breaker"], ans: 0 },
+            { q: "Which test ensures that there is no break in an electrical conductor or circuit?", options: ["A) Insulation test", "B) Polarity test", "C) Continuity test", "D) Earth resistance test"], ans: 2 },
+            { q: "When two dissimilar metals are joined and the junction is heated, a small voltage is produced. This principle is used in:", options: ["A) Thermistors", "B) Thermocouples", "C) Photo-diodes", "D) Transformers"], ans: 1 },
+            { q: "What is the purpose of lagging the power factor in industrial plants?", options: ["A) It is not intentional; it is caused by highly inductive loads like motors", "B) To save energy", "C) To increase the voltage", "D) To decrease cable size"], ans: 0 },
+            { q: "How can a low (lagging) power factor be corrected in an industrial setting?", options: ["A) By adding inductors in series", "B) By adding capacitor banks in parallel", "C) By increasing the supply voltage", "D) By removing the earth wire"], ans: 1 },
+            { q: "In a Star-Delta starter, what voltage is applied to the motor windings during the 'Star' phase?", options: ["A) Full line voltage", "B) Line voltage divided by √3", "C) Line voltage divided by 3", "D) Double the line voltage"], ans: 1 },
+            { q: "Which part of a DC generator acts as a rotating switch to convert AC to DC?", options: ["A) Yoke", "B) Slip rings", "C) Commutator", "D) Armature core"], ans: 2 },
+            { q: "The resistance of an ideal conductor is:", options: ["A) Infinite", "B) Very high", "C) Zero", "D) 1 Ohm"], ans: 2 },
+            { q: "Which tool is best used to check the outer diameter of a wire precisely?", options: ["A) Measuring tape", "B) Micrometer / Wire Gauge", "C) Ruler", "D) Plumb bob"], ans: 1 },
+            { q: "A 'Lugs' primary purpose in electrical termination is to:", options: ["A) Add resistance to the circuit", "B) Provide a secure and durable connection to a terminal block or bolt", "C) Insulate the wire", "D) Act as a fuse"], ans: 1 },
+            { q: "If a 100W bulb runs for 10 hours, how much electrical energy is consumed?", options: ["A) 1 kWh (1 Unit)", "B) 10 kWh", "C) 100 kWh", "D) 1000 kWh"], ans: 0 },
+            { q: "In house wiring, the switch is always connected in series with the:", options: ["A) Neutral wire", "B) Phase (Live) wire", "C) Earth wire", "D) Load directly"], ans: 1 },
+            { q: "Which of the following is an example of a secondary cell (rechargeable)?", options: ["A) Zinc-Carbon cell", "B) Alkaline cell", "C) Lead-Acid battery", "D) Silver-oxide button cell"], ans: 2 },
+            { q: "To reverse the direction of rotation of a DC shunt motor, you must:", options: ["A) Reverse the supply terminals", "B) Reverse either the armature connections or the field connections", "C) Reduce the supply voltage", "D) Add a capacitor"], ans: 1 },
+            { q: "What is the primary function of an inverter in a home solar power system?", options: ["A) To convert AC power from the grid to DC power for the batteries", "B) To convert DC power from the panels/batteries to AC power for appliances", "C) To regulate the charging of the batteries", "D) To track the sun's movement"], ans: 1 },
+            { q: "Which type of transformer is used in a welding machine?", options: ["A) Step-up transformer", "B) Step-down transformer", "C) Isolation transformer", "D) Auto-transformer"], ans: 1 },
+            { q: "The term 'busbar' in a power panel refers to:", options: ["A) A vehicle used for transporting electricians", "B) A thick copper or aluminum strip used to distribute large amounts of current", "C) A type of insulation tape", "D) A warning sign for high voltage"], ans: 1 },
+            { q: "What causes a 'voltage drop' in a long cable?", options: ["A) The inductance of the load", "B) The natural resistance of the cable's conductor material over the distance", "C) The frequency of the AC supply", "D) High insulation resistance"], ans: 1 },
+            { q: "Which motor is preferred for a ceiling fan?", options: ["A) Permanent capacitor single-phase motor", "B) DC Series motor", "C) 3-phase induction motor", "D) Repulsion motor"], ans: 0 },
+            { q: "An electrical fire caused by a short circuit is best smothered using:", options: ["A) Sand", "B) Water", "C) A damp blanket", "D) Foam"], ans: 0 },
+            { q: "What is the main application of a 'Grommet' in electrical enclosures?", options: ["A) To connect two wires", "B) To protect wires from being cut by the sharp edges of a metal hole", "C) To act as a heat sink", "D) To secure the panel door"], ans: 1 },
+            { q: "The SI unit of electrical energy is the Joule. In commercial terms, 1 kilowatt-hour (kWh) equals:", options: ["A) 1,000 Joules", "B) 3,600 Joules", "C) 3,600,000 Joules", "D) 1,000,000 Joules"], ans: 2 }
+        ]
+    };
+
+    // --- STATE VARIABLES ---
+    let currentSet = 1;
+    let timerInterval;
+    let timeRemaining = 1800; // 30 mins * 60 seconds
+    const totalQuestions = 25;
+    let userResults = {}; 
+
+    // --- INITIALIZATION ---
+    window.onload = () => {
+        const setContainer = document.getElementById("set-buttons");
+        for (let i = 1; i <= 10; i++) {
+            let btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Start Set " + i;
+            
+            // Disable sets that don't have questions yet 
+            if(testData[i].length < 25) {
+                btn.disabled = true;
+                btn.innerText += " (Coming Soon)";
+            }
+            
+            btn.onclick = () => startTest(i);
+            setContainer.appendChild(btn);
+        }
+    };
+
+    // --- TEST LOGIC ---
+    function startTest(setNum) {
+        currentSet = setNum;
+        timeRemaining = 1800;
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("test-view").style.display = "block";
+        document.getElementById("set-title").innerText = "Electrician Mock Test - Set " + setNum;
+        
+        renderQuestions();
+        startTimer();
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions-container");
+        container.innerHTML = "";
+        let questions = testData[currentSet];
+        
+        questions.forEach((qObj, index) => {
+            let qDiv = document.createElement("div");
+            qDiv.className = "question-card";
+            
+            let html = `<p>Q${index + 1}. ${qObj.q}</p><div class="options">`;
+            qObj.options.forEach((opt, optIndex) => {
+                html += `<label>
+                            <input type="radio" name="q${index}" value="${optIndex}"> 
+                            ${opt}
+                         </label>`;
+            });
+            html += `</div>`;
+            qDiv.innerHTML = html;
+            container.appendChild(qDiv);
+        });
+    }
+
+    // --- TIMER LOGIC ---
+    function startTimer() {
+        updateTimeDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimeDisplay();
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("Time is up! Auto-submitting your test.");
+                calculateScore();
+            }
+        }, 1000);
+    }
+
+    function updateTimeDisplay() {
+        let minutes = Math.floor(timeRemaining / 60);
+        let seconds = timeRemaining % 60;
+        document.getElementById("time-display").innerText = 
+            (minutes < 10 ? "0" : "") + minutes + ":" + 
+            (seconds < 10 ? "0" : "") + seconds;
+    }
+
+    // --- SUBMISSION & GRADING ---
+    function manualSubmit() {
+        let answered = 0;
+        for (let i = 0; i < totalQuestions; i++) {
+            if (document.querySelector(`input[name="q${i}"]:checked`)) {
+                answered++;
+            }
+        }
+        
+        if (answered < totalQuestions) {
+            alert(`You have only answered ${answered} out of ${totalQuestions} questions. All questions are compulsory. Please answer the remaining questions.`);
+            return;
+        }
+
+        let confirmSubmit = confirm("Are you sure you want to submit?");
+        if (confirmSubmit) {
+            clearInterval(timerInterval);
+            calculateScore();
+        }
+    }
+
+    function calculateScore() {
+        let score = 0;
+        let questions = testData[currentSet];
+        
+        for (let i = 0; i < totalQuestions; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected && parseInt(selected.value) === questions[i].ans) {
+                score++;
+            }
+        }
+
+        let percentage = (score / totalQuestions) * 100;
+        let status = percentage >= 50 ? "PASS" : "FAIL";
+        let statusClass = percentage >= 50 ? "pass" : "fail";
+
+        userResults[currentSet] = { score: score, percent: percentage, status: status };
+
+        document.getElementById("test-view").style.display = "none";
+        document.getElementById("result-view").style.display = "block";
+        
+        document.getElementById("result-details").innerHTML = `
+            <h3>Set ${currentSet} Result</h3>
+            <p style="font-size: 20px;">Score: <strong>${score} / ${totalQuestions}</strong></p>
+            <p style="font-size: 20px;">Percentage: <strong>${percentage}%</strong></p>
+            <p class="${statusClass}">${status}</p>
+        `;
+        
+        let btns = document.getElementById("set-buttons").getElementsByTagName("button");
+        btns[currentSet - 1].innerText = `Set ${currentSet} - ${score}/25`;
+        btns[currentSet - 1].style.backgroundColor = percentage >= 50 ? "#2ecc71" : "#e74c3c";
+        btns[currentSet - 1].style.color = "white";
+    }
+
+    // --- NAVIGATION ---
+    function returnToDashboard() {
+        document.getElementById("result-view").style.display = "none";
+        document.getElementById("overall-view").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+    }
+
+    function showOverallResult() {
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("overall-view").style.display = "block";
+        
+        let container = document.getElementById("overall-table-container");
+        
+        if (Object.keys(userResults).length === 0) {
+            container.innerHTML = "<p style='text-align:center;'>No sets attempted yet.</p>";
+            return;
+        }
+
+        let html = `<table>
+            <tr>
+                <th>Set No.</th>
+                <th>Score (Out of 25)</th>
+                <th>Percentage</th>
+                <th>Result</th>
+            </tr>`;
+            
+        let totalScore = 0;
+        let attempted = 0;
+
+        for (let i = 1; i <= 10; i++) {
+            if (userResults[i]) {
+                attempted++;
+                totalScore += userResults[i].score;
+                let statusColor = userResults[i].status === "PASS" ? "green" : "red";
+                html += `<tr>
+                    <td>Set ${i}</td>
+                    <td>${userResults[i].score}</td>
+                    <td>${userResults[i].percent}%</td>
+                    <td style="color:${statusColor}; font-weight:bold;">${userResults[i].status}</td>
+                </tr>`;
+            }
+        }
+        
+        let overallPercent = ((totalScore / (attempted * 25)) * 100).toFixed(2);
+        let finalStatus = overallPercent >= 50 ? "PASS" : "FAIL";
+        let finalColor = overallPercent >= 50 ? "green" : "red";
+
+        html += `<tr style="background:#f1f1f1; font-weight:bold;">
+            <td>OVERALL</td>
+            <td>${totalScore} / ${attempted * 25}</td>
+            <td>${overallPercent}%</td>
+            <td style="color:${finalColor};">${finalStatus}</td>
+        </tr></table>`;
+        
+        container.innerHTML = html;
+    }
+</script>
+</body>
+</html>

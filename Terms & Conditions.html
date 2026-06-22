@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - Accordion Style</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #4f46e5; /* Premium Indigo */
+            --primary-light: #e0e7ff;
+            --text-dark: #111827;
+            --text-gray: #4b5563;
+            --bg-color: #f9fafb;
+            --white: #ffffff;
+            --border: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            padding-bottom: 100px;
+        }
+
+        /* Minimal Header */
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            color: var(--text-dark);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-gray);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        .toggle-all-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .toggle-all-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* Accordion Styles */
+        .accordion {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-header {
+            width: 100%;
+            background: var(--white);
+            border: none;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: left;
+        }
+
+        .accordion-header:hover {
+            background: var(--primary-light);
+        }
+
+        .accordion-header.active {
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .icon {
+            font-size: 20px;
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-header.active .icon {
+            transform: rotate(45deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+            background: var(--white);
+        }
+
+        .content-inner {
+            padding: 0 25px 25px 25px;
+            color: var(--text-gray);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .content-inner ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+
+        .content-inner li {
+            margin-bottom: 8px;
+        }
+
+        /* Sticky Footer for Action */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            padding: 15px 20px;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            z-index: 100;
+            border-top: 1px solid var(--border);
+        }
+
+        .sticky-footer p {
+            font-size: 14px;
+            color: var(--text-gray);
+            font-weight: 500;
+        }
+
+        .accept-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .accept-btn:hover {
+            background: #4338ca;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        /* --- NEW: Modal (Pop-up) Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show .modal-box {
+            transform: translateY(0);
+        }
+
+        .modal-box h2 {
+            font-size: 20px;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+
+        .modal-box p {
+            font-size: 15px;
+            color: var(--text-gray);
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .cancel-btn {
+            background: var(--white);
+            color: var(--text-dark);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .cancel-btn:hover {
+            background: var(--bg-color);
+        }
+
+        .confirm-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .confirm-btn:hover {
+            background: #4338ca;
+        }
+
+        @media (max-width: 600px) {
+            .sticky-footer {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .accept-btn {
+                width: 100%;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .cancel-btn, .confirm-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <h1>Terms & Conditions</h1>
+        <p>Please review our platform rules. Click on any section below to read the details.</p>
+    </header>
+
+    <div class="container">
+        
+        <div class="controls">
+            <button class="toggle-all-btn" id="toggleAll">Expand All</button>
+        </div>
+
+        <div class="accordion">
+            
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    1. General Terms & Introduction <i class="fas fa-plus icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="content-inner">
+                        <p>Welcome to Learning Hub. These Terms and Conditions govern your use of our website and services. By accessing our platform, you agree to comply with these terms. If you disagree with any part of the terms, you may not access the service.</p>
+                        <p>We reserve the right to modify these terms at any time. Your continued use of the platform constitutes your acceptance of the new Terms and Conditions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    2. User Registration & Security <i class="fas fa-plus icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="content-inner">
+                        <p>When you create an account with us, you must provide accurate and complete information. You are solely responsible for:</p>
+                        <ul>
+                            <li>Maintaining the confidentiality of your account and password.</li>
+                            <li>Restricting access to your computer/device.</li>
+                            <li>All activities that occur under your account.</li>
+                        </ul>
+                        <p>You must notify us immediately upon becoming aware of any breach of security or unauthorized use of your account.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    3. Course Enrollment & Lifetime Access <i class="fas fa-plus icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="content-inner">
+                        <p>When you enroll in a course, you get a personal, non-exclusive, non-transferable license to view the course materials. "Lifetime Access" means access for as long as Learning Hub continues to offer the course.</p>
+                        <p>You are strictly prohibited from downloading, recording, or redistributing our video content or materials. Violation of this rule will result in immediate account termination without a refund.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    4. Pricing, Payments & Refund Policy <i class="fas fa-plus icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="content-inner">
+                        <p>All payments are securely processed through our third-party payment gateways. By providing payment information, you represent that you are legally authorized to use the payment method.</p>
+                        <p><strong>Refunds:</strong> We offer a strict 7-day refund policy. If you are not satisfied with a course, you can claim a refund within 7 days of purchase, provided you have not completed more than 20% of the course content.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <button class="accordion-header">
+                    5. Copyright & Intellectual Property <i class="fas fa-plus icon"></i>
+                </button>
+                <div class="accordion-content">
+                    <div class="content-inner">
+                        <p>The service and its original content, features, and functionality are and will remain the exclusive property of Learning Hub and its licensors. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <h2>Confirm Agreement</h2>
+            <p>Are you sure you want to accept all Terms & Conditions and proceed?</p>
+            <div class="modal-actions">
+                <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="confirm-btn" onclick="proceedToNextPage()">Yes, I Agree</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sticky-footer">
+        <p>By continuing to use our platform, you agree to our Terms & Conditions.</p>
+        <button class="accept-btn" onclick="openModal()">Agree & Continue</button>
+    </div>
+
+    <script>
+        const headers = document.querySelectorAll('.accordion-header');
+        const toggleAllBtn = document.getElementById('toggleAll');
+        let isAllExpanded = false;
+
+        // Individual Accordion Click
+        headers.forEach(header => {
+            header.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                
+                if (content.style.maxHeight) {
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        });
+
+        // Expand/Collapse All Button
+        toggleAllBtn.addEventListener('click', function() {
+            isAllExpanded = !isAllExpanded;
+            
+            headers.forEach(header => {
+                const content = header.nextElementSibling;
+                
+                if (isAllExpanded) {
+                    header.classList.add('active');
+                    content.style.maxHeight = content.scrollHeight + "px";
+                    this.textContent = "Collapse All";
+                } else {
+                    header.classList.remove('active');
+                    content.style.maxHeight = null;
+                    this.textContent = "Expand All";
+                }
+            });
+        });
+
+        // --- NEW: Modal Functions ---
+
+        // Yeh function pop-up dikhayega
+        function openModal() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        // Yeh function pop-up band karega
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        // Yeh function actual redirect / exit ka kaam karega
+        function proceedToNextPage() {
+            if (document.referrer && document.referrer !== "") {
+                window.location.replace(document.referrer);
+            } 
+            else if (window.history.length > 1) {
+                window.history.back();
+            } 
+            else {
+                // "index.html" ki jagah aap apna default page URL daal sakte hain
+                window.location.replace("home.html"); 
+            }
+        }
+    </script>
+</body>
+</html>

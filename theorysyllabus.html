@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Trade Theory</title>
+
+<style>
+/* Reset & Base Styles */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body{
+    background-color: #f1f5f9; /* Soft light background */
+    color: #334155;
+    min-height: 100vh;
+}
+
+/* Stunning Gradient Header */
+.header{
+    background: linear-gradient(135deg, #1e1b4b, #4338ca, #3b82f6);
+    color: white;
+    text-align: center;
+    padding: 70px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: #f1f5f9;
+    transform: skewY(-2deg);
+}
+
+.header h1{
+    font-size: 46px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.header p{
+    font-size: 19px;
+    color: #e0e7ff;
+    font-weight: 300;
+}
+
+/* Main Layout Container */
+.container{
+    width: 95%;
+    max-width: 1150px;
+    margin: -30px auto 50px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    min-height: 550px;
+}
+
+/* Left Sidebar - Menu */
+.sidebar{
+    width: 28%;
+    background: #ffffff;
+    padding: 30px 20px;
+    border-right: 2px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Premium Pill-Shaped Buttons */
+.tab-btn{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    text-align: left;
+    font-size: 17px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn span {
+    font-size: 22px;
+}
+
+.tab-btn:hover{
+    background: #f8fafc;
+    color: #334155;
+    transform: translateX(5px);
+}
+
+/* Active State for Button */
+.tab-btn.active{
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    color: white;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    transform: translateX(5px);
+}
+
+/* Right Content Area */
+.content-area{
+    width: 72%;
+    padding: 40px 50px;
+    background: #fafaf9;
+}
+
+.tab-content{
+    display: none;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.tab-content.active{
+    display: block;
+}
+
+@keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.content-header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.content-header h2{
+    color: #0f172a;
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.content-header p{
+    font-size: 17px;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* Upgraded UI List for Theory Points */
+.theory-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.theory-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.theory-list li:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    transform: translateY(-3px);
+}
+
+/* Icon Box inside List */
+.icon-box {
+    background: #eef2ff;
+    color: #4f46e5;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.text-box strong {
+    font-size: 19px;
+    color: #1e293b;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.text-box span {
+    font-size: 15px;
+    color: #475569;
+    line-height: 1.6;
+}
+
+/* Back Button */
+.back-btn{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 250px;
+    margin: 20px auto 60px;
+    text-decoration: none;
+    background: white;
+    color: #0f172a;
+    padding: 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    border: 2px solid transparent;
+}
+
+.back-btn:hover{
+    border-color: #4f46e5;
+    color: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(79, 70, 229, 0.15);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+    .container {
+        flex-direction: column;
+        margin-top: 20px;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 2px solid #f1f5f9;
+        white-space: nowrap;
+    }
+    .tab-btn {
+        width: auto;
+        padding: 12px 20px;
+        transform: none !important;
+    }
+    .content-area {
+        width: 100%;
+        padding: 30px 20px;
+    }
+    .theory-list li {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>📖 Master Your Trade Theory</h1>
+    <p>Dive deep into the science, rules, and core concepts of your chosen field.</p>
+</div>
+
+<div class="container">
+    
+    <div class="sidebar">
+        <button class="tab-btn active" onclick="openTab(event, 'intro')">
+            <span>📌</span> Introduction
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'copa')">
+            <span>💻</span> COPA
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'electrician')">
+            <span>⚡</span> Electrician
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'electronics')">
+            <span>📡</span> Electronics
+        </button>
+    </div>
+
+    <div class="content-area">
+        
+        <div id="intro" class="tab-content active">
+            <div class="content-header">
+                <h2>What is Trade Theory?</h2>
+                <p>Trade Theory explains the <strong>"Why"</strong> behind the practical work. It covers the technical calculations, scientific laws, and safety regulations essential for a professional.</p>
+            </div>
+            <ul class="theory-list">
+                <li>
+                    <div class="icon-box">🛡️</div>
+                    <div class="text-box">
+                        <strong>Occupational Safety</strong>
+                        <span>Workplace safety rules, hazard prevention, and first-aid procedures to ensure a secure working environment.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🛠️</div>
+                    <div class="text-box">
+                        <strong>Tools & Equipment</strong>
+                        <span>Detailed study of precision tools, their manufacturing materials, and the correct calibration methods.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">📐</div>
+                    <div class="text-box">
+                        <strong>Core Engineering Laws</strong>
+                        <span>The underlying mathematical and physical principles that govern your specific trade operations.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div id="copa" class="tab-content">
+            <div class="content-header">
+                <h2>COPA Theory</h2>
+                <p>Computer Operator & Programming Assistant logic, hardware architecture, and software rules.</p>
+            </div>
+            <ul class="theory-list">
+                <li>
+                    <div class="icon-box">🖥️</div>
+                    <div class="text-box">
+                        <strong>Computer Architecture</strong>
+                        <span>In-depth study of CPU processing, Memory hierarchy (RAM/ROM), and Motherboard layout.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">⚙️</div>
+                    <div class="text-box">
+                        <strong>OS & File Systems</strong>
+                        <span>Booting mechanisms, Kernel operations, and differences between FAT32, NTFS, and ext4.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🌐</div>
+                    <div class="text-box">
+                        <strong>Networking Principles</strong>
+                        <span>Understanding the 7-Layer OSI Model, IP addressing structures, and network topologies.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🗄️</div>
+                    <div class="text-box">
+                        <strong>Database Logic</strong>
+                        <span>Relational Database theories, Primary vs. Foreign keys, and data normalization.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div id="electrician" class="tab-content">
+            <div class="content-header">
+                <h2>Electrician Theory</h2>
+                <p>The physics of electrical flow, circuitry rules, and electromagnetic machine properties.</p>
+            </div>
+            <ul class="theory-list">
+                <li>
+                    <div class="icon-box">🔌</div>
+                    <div class="text-box">
+                        <strong>Electrical Physics</strong>
+                        <span>Calculations involving Ohm's Law, Kirchhoff's current/voltage laws, and total power formulas.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🔄</div>
+                    <div class="text-box">
+                        <strong>Machine Principles</strong>
+                        <span>Faraday's laws of electromagnetic induction driving both AC and DC motors/generators.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🔋</div>
+                    <div class="text-box">
+                        <strong>Transformer Mechanics</strong>
+                        <span>Voltage stepping logic, magnetic flux paths, and understanding copper vs. core losses.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🏗️</div>
+                    <div class="text-box">
+                        <strong>Standard Wiring Laws</strong>
+                        <span>Indian Electricity (I.E.) Rules for domestic wiring, and proper plate/pipe earthing techniques.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div id="electronics" class="tab-content">
+            <div class="content-header">
+                <h2>Electronics Theory</h2>
+                <p>Behavior of electrons within semiconductor materials and micro-circuit engineering.</p>
+            </div>
+            <ul class="theory-list">
+                <li>
+                    <div class="icon-box">⚛️</div>
+                    <div class="text-box">
+                        <strong>Semiconductor Physics</strong>
+                        <span>Atomic-level study of P-Type/N-Type doping and the creation of P-N depletion layers.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">📟</div>
+                    <div class="text-box">
+                        <strong>Component Analysis</strong>
+                        <span>How diodes rectify AC to DC, and the amplification/switching characteristics of BJT and FET transistors.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">🔢</div>
+                    <div class="text-box">
+                        <strong>Digital Logic Design</strong>
+                        <span>Binary and Hexadecimal mathematics, Boolean algebra, and standard Logic Gate truth tables.</span>
+                    </div>
+                </li>
+                <li>
+                    <div class="icon-box">📡</div>
+                    <div class="text-box">
+                        <strong>Signal Communication</strong>
+                        <span>Theoretical concepts of Amplitude (AM) and Frequency (FM) modulation and transmission.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+<a href="javascript:history.back()" class="back-btn">⬅ Back to Learning Hub</a>
+<script>
+function openTab(evt, tabName) {
+    // Hide all tab content
+    var tabContent = document.getElementsByClassName("tab-content");
+    for (var i = 0; i < tabContent.length; i++) {
+        tabContent[i].classList.remove("active");
+    }
+
+    // Remove active styling from all buttons
+    var tabBtns = document.getElementsByClassName("tab-btn");
+    for (var i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove("active");
+    }
+
+    // Show the targeted tab and highlight the clicked button
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+</script>
+
+</body>
+</html>

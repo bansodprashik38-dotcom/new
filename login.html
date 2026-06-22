@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure Login System</title>
+<style>
+body{
+font-family:Segoe UI,sans-serif;
+background:linear-gradient(120deg,#4facfe,#00f2fe);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+margin:0;
+}
+.box{
+background:#fff;
+padding:30px;
+width:380px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,.2);
+}
+input{
+width:100%;
+padding:12px;
+margin:8px 0;
+border:1px solid #ccc;
+border-radius:8px;
+box-sizing:border-box;
+}
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+background:#4facfe;
+color:#fff;
+border:none;
+border-radius:8px;
+cursor:pointer;
+}
+h2{text-align:center;}
+.msg{text-align:center;font-weight:bold; font-size: 14px;}
+#registerBox{display:none;}
+</style>
+</head>
+<body>
+
+<div class="box">
+
+    <div id="loginBox">
+        <h2>Login</h2>
+        <input type="email" id="loginEmail" placeholder="Enter your Email">
+        <input type="password" id="loginPassword" placeholder="Enter your Password">
+        <button onclick="loginUser()">Login</button>
+        <p class="msg" id="loginMsg" style="color: red;"></p>
+        <p style="text-align:center">
+            No Account? 
+            <a href="#" onclick="showRegister()">Create Account</a>
+        </p>
+    </div>
+
+    <div id="registerBox">
+        <h2>Create Account</h2>
+        <input type="email" id="regEmail" placeholder="Enter New Email">
+        <input type="password" id="regPassword" placeholder="Enter New Password">
+        <button onclick="registerUser()">Create Account</button>
+        <p class="msg" id="regMsg"></p>
+        <p style="text-align:center">
+            Already have an account? 
+            <a href="#" onclick="showLogin()">Login</a>
+        </p>
+    </div>
+
+</div>
+
+<script>
+window.onload = function() {
+    // Agar user pehle se logged in hai toh home.html par bhej dein
+    if(sessionStorage.getItem("loggedIn") === "true"){
+        window.location.replace("home.html");
+    }
+};
+
+function showRegister(){
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("registerBox").style.display = "block";
+    document.getElementById("loginMsg").innerHTML = "";
+}
+
+function showLogin(){
+    document.getElementById("registerBox").style.display = "none";
+    document.getElementById("loginBox").style.display = "block";
+    document.getElementById("regMsg").innerHTML = "";
+}
+
+function registerUser(){
+    let email = document.getElementById("regEmail").value;
+    let password = document.getElementById("regPassword").value;
+    let regMsg = document.getElementById("regMsg");
+
+    if(email === "" || password === ""){
+        regMsg.style.color = "red";
+        regMsg.innerHTML = "Please fill all fields!";
+        return;
+    }
+
+    // User jo bhi input karega, wahi save hoga
+    localStorage.setItem("userEmail", email);
+    localStorage.setItem("userPassword", password);
+
+    regMsg.style.color = "green";
+    regMsg.innerHTML = "Account Created Successfully! Switching to Login...";
+    
+    // 1.5 seconds baad automatically login screen par le jayega
+    setTimeout(function(){
+        showLogin();
+        document.getElementById("regEmail").value = "";
+        document.getElementById("regPassword").value = "";
+    }, 1500);
+}
+
+function loginUser(){
+    let email = document.getElementById("loginEmail").value;
+    let password = document.getElementById("loginPassword").value;
+    let loginMsg = document.getElementById("loginMsg");
+
+    if(email === "" || password === ""){
+        loginMsg.innerHTML = "Please enter both Email and Password!";
+        return;
+    }
+
+    let savedEmail = localStorage.getItem("userEmail");
+    let savedPassword = localStorage.getItem("userPassword");
+
+    // Agar local storage mein koi data nahi hai (yani pehle koi account nahi bana)
+    if(!savedEmail){
+        loginMsg.innerHTML = "No account exists. Please click 'Create Account' first.";
+        return;
+    }
+
+    // Saved details se verify karna
+    if(email === savedEmail && password === savedPassword){
+        sessionStorage.setItem("loggedIn", "true");
+        window.location.replace("home.html");
+    } else {
+        loginMsg.innerHTML = "Invalid Email or Password!";
+    }
+}
+</script>
+
+</body>
+</html>

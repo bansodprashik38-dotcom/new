@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronics Mock Test Engine - Complete</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+            position: relative; 
+        }
+
+        /* ---- NEW: Bottom Center Back Button Styling ---- */
+        .back-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+
+        .back-btn-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #e67e22; /* Matched with your Electronics mock test buttons */
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn-pro:hover {
+            background-color: #d35400; 
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: translateY(-4px); /* Upward slide animation for center button */
+        }
+
+        .back-btn-pro svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        /* --------------------------------------------- */
+
+        .container { max-width: 900px; margin: 40px auto 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .btn { padding: 12px 20px; background-color: #e67e22; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; width: 100%; }
+        .btn:hover { background-color: #d35400; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .btn-success { background-color: #2ecc71; }
+        .btn-success:hover { background-color: #27ae60; }
+        
+        /* Quiz UI */
+        #timer-bar { display: flex; justify-content: space-between; align-items: center; background: #2c3e50; color: white; padding: 15px; border-radius: 5px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; margin-bottom: 20px;}
+        .question-card { background: #fafafa; padding: 20px; border-left: 5px solid #e67e22; margin-bottom: 15px; border-radius: 4px; }
+        .question-card p { font-weight: bold; font-size: 16px; margin-top: 0; }
+        .options label { display: block; padding: 8px; cursor: pointer; background: #fff; border: 1px solid #ddd; margin-bottom: 8px; border-radius: 4px; }
+        .options label:hover { background: #f1f1f1; }
+        .options input { margin-right: 10px; }
+        
+        /* Results */
+        .result-box { text-align: center; padding: 30px; border: 2px dashed #bdc3c7; border-radius: 10px; margin-top: 20px; }
+        .pass { color: #2ecc71; font-weight: bold; font-size: 24px; }
+        .fail { color: #e74c3c; font-weight: bold; font-size: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #e67e22; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dashboard">
+        <h1>Electronics Mock Test Series</h1>
+        <p style="text-align: center;">10 Sets | 25 Questions Each | 30 Mins per Set | Passing: 50%</p>
+        <div class="grid" id="set-buttons">
+            </div>
+        <br>
+        <button class="btn btn-success" onclick="showOverallResult()">View Final Overall Result</button>
+    </div>
+
+    <div id="test-view" style="display: none;">
+        <div id="timer-bar">
+            <span id="set-title">Set 1</span>
+            <span>Time Left: <span id="time-display">30:00</span></span>
+        </div>
+        <div id="questions-container"></div>
+        <br>
+        <button class="btn btn-success" onclick="manualSubmit()">Submit Test</button>
+    </div>
+
+    <div id="result-view" style="display: none;">
+        <h2>Test Completed</h2>
+        <div class="result-box" id="result-details"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+
+    <div id="overall-view" style="display: none;">
+        <h2>Final Overall Results</h2>
+        <div id="overall-table-container"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+</div>
+
+<!-- NEW: Bottom Center Back Button Here -->
+<div class="back-wrapper">
+    <a href="javascript:history.back()" class="back-btn-pro">
+        <svg viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+        </svg>
+        Return To Home Page
+    </a>
+</div>
+
+<script>
+    // --- FULL 10-SET ELECTRONICS DATABASE ---
+    const testData = {
+        1: [
+            { q: "What is the basic unit of electrical resistance?", options: ["A) Volt", "B) Ampere", "C) Ohm", "D) Watt"], ans: 2 },
+            { q: "Which of the following represents Ohm's Law?", options: ["A) V = I/R", "B) V = IR", "C) P = VI", "D) I = VR"], ans: 1 },
+            { q: "A PN junction diode allows current to flow in:", options: ["A) Both directions equally", "B) One direction only", "C) Neither direction", "D) Alternating directions"], ans: 1 },
+            { q: "Which component is used to block DC and allow AC to pass?", options: ["A) Resistor", "B) Inductor", "C) Capacitor", "D) Diode"], ans: 2 },
+            { q: "What is the standard unit of capacitance?", options: ["A) Henry", "B) Tesla", "C) Coulomb", "D) Farad"], ans: 3 },
+            { q: "How many terminals does a standard Bipolar Junction Transistor (BJT) have?", options: ["A) 2", "B) 3", "C) 4", "D) 5"], ans: 1 },
+            { q: "A Zener diode is primarily used for:", options: ["A) Rectification", "B) Amplification", "C) Voltage regulation", "D) Oscillation"], ans: 2 },
+            { q: "The process of converting Alternating Current (AC) to Direct Current (DC) is called:", options: ["A) Inversion", "B) Amplification", "C) Rectification", "D) Modulation"], ans: 2 },
+            { q: "How many pins does a standard 741 Operational Amplifier (Op-Amp) IC have?", options: ["A) 6", "B) 8", "C) 14", "D) 16"], ans: 1 },
+            { q: "Which logic gate produces a HIGH (1) output only when ALL its inputs are HIGH (1)?", options: ["A) OR Gate", "B) NOR Gate", "C) AND Gate", "D) XOR Gate"], ans: 2 },
+            { q: "What is the color code for a 1kΩ (1000 ohms) resistor with 5% tolerance?", options: ["A) Brown, Black, Red, Gold", "B) Brown, Black, Orange, Gold", "C) Red, Red, Red, Gold", "D) Brown, Black, Black, Gold"], ans: 0 },
+            { q: "An inductor opposes the change in:", options: ["A) Voltage", "B) Current", "C) Resistance", "D) Power"], ans: 1 },
+            { q: "Which of the following is considered an 'Active' electronic component?", options: ["A) Capacitor", "B) Resistor", "C) Inductor", "D) Transistor"], ans: 3 },
+            { q: "What does BJT stand for?", options: ["A) Bi-Junction Transistor", "B) Bipolar Junction Transistor", "C) Base Junction Terminal", "D) Bipolar Junction Terminal"], ans: 1 },
+            { q: "In electronics manufacturing, PCB stands for:", options: ["A) Printed Circuit Board", "B) Power Control Block", "C) Primary Circuit Breaker", "D) Plastic Covered Board"], ans: 0 },
+            { q: "A Common Emitter (CE) amplifier produces a phase shift of:", options: ["A) 0 degrees", "B) 90 degrees", "C) 180 degrees", "D) 360 degrees"], ans: 2 },
+            { q: "The IC 555 is most commonly used as a:", options: ["A) Voltage Regulator", "B) Timer/Oscillator", "C) Operational Amplifier", "D) Microcontroller"], ans: 1 },
+            { q: "LED stands for:", options: ["A) Light Emitting Diode", "B) Liquid Emitting Display", "C) Light Energy Diode", "D) Low Energy Display"], ans: 0 },
+            { q: "Which material is most widely used in the manufacturing of semiconductor devices?", options: ["A) Germanium", "B) Copper", "C) Silicon", "D) Aluminum"], ans: 2 },
+            { q: "A Flip-Flop is a digital circuit that stores:", options: ["A) 1 byte of data", "B) 1 bit of data", "C) An analog voltage", "D) A continuous frequency"], ans: 1 },
+            { q: "To measure current, an ammeter must be connected in:", options: ["A) Series with the load", "B) Parallel with the load", "C) Series-Parallel", "D) Across the power supply"], ans: 0 },
+            { q: "Kirchhoff's Current Law (KCL) is based on the principle of conservation of:", options: ["A) Energy", "B) Mass", "C) Momentum", "D) Charge"], ans: 3 },
+            { q: "In an N-type semiconductor, the majority charge carriers are:", options: ["A) Holes", "B) Protons", "C) Electrons", "D) Neutrons"], ans: 2 },
+            { q: "A transformer works on the principle of:", options: ["A) Mutual induction and requires AC", "B) Self-induction and requires DC", "C) Capacitive coupling", "D) Resistive heating"], ans: 0 },
+            { q: "A standard multimeter can typically measure which of the following?", options: ["A) Voltage, Current, Resistance", "B) Voltage only", "C) Current only", "D) Power factor only"], ans: 0 }
+        ],
+        2: [
+            { q: "A basic half-wave rectifier requires a minimum of how many diodes?", options: ["A) 1", "B) 2", "C) 3", "D) 4"], ans: 0 },
+            { q: "A full-wave bridge rectifier utilizes how many diodes?", options: ["A) 1", "B) 2", "C) 4", "D) 6"], ans: 2 },
+            { q: "What is the standard unit of measurement for Inductance?", options: ["A) Farad", "B) Weber", "C) Henry", "D) Tesla"], ans: 2 },
+            { q: "What does MOSFET stand for?", options: ["A) Metal Oxide Semiconductor Field Effect Transistor", "B) Magnetic Output Silicon Field Effect Transistor", "C) Metal Output Source Field Effect Transistor", "D) Main Operating Silicon Field Effect Transistor"], ans: 0 },
+            { q: "What is the ripple factor of a full-wave rectifier?", options: ["A) 1.21", "B) 0.48", "C) 0.81", "D) 1.11"], ans: 1 },
+            { q: "What is the open-loop voltage gain of an ideal Operational Amplifier?", options: ["A) Zero", "B) 1", "C) 100", "D) Infinite"], ans: 3 },
+            { q: "Which two logic gates are known as 'Universal Gates'?", options: ["A) AND and OR", "B) NAND and NOR", "C) XOR and XNOR", "D) NOT and AND"], ans: 1 },
+            { q: "What is the Boolean expression for an OR gate?", options: ["A) Y = A.B", "B) Y = A + B", "C) Y = A'", "D) Y = A ⊕ B"], ans: 1 },
+            { q: "LDR is a sensor component that stands for:", options: ["A) Light Dependent Resistor", "B) Linear Diode Rectifier", "C) Laser Diode Receiver", "D) Low Drop Regulator"], ans: 0 },
+            { q: "An electronic oscillator circuit converts:", options: ["A) AC power to DC power", "B) High voltage to low voltage", "C) DC power to AC power at a specific frequency", "D) Analog signals to digital signals"], ans: 2 },
+            { q: "According to the Barkhausen criterion, for sustained oscillations, the loop gain must be:", options: ["A) Less than 1", "B) Equal to or greater than 1", "C) Zero", "D) Negative"], ans: 1 },
+            { q: "How many valence electrons does a pure semiconductor atom (like Silicon) have?", options: ["A) 2", "B) 4", "C) 6", "D) 8"], ans: 1 },
+            { q: "The typical forward voltage drop of a Silicon diode is approximately:", options: ["A) 0.3V", "B) 0.7V", "C) 1.2V", "D) 2.0V"], ans: 1 },
+            { q: "To measure voltage across a component, a voltmeter must be connected in:", options: ["A) Series", "B) Parallel", "C) Series-Parallel", "D) Star configuration"], ans: 1 },
+            { q: "In a Bipolar Junction Transistor (BJT), which region is the most heavily doped?", options: ["A) Emitter", "B) Base", "C) Collector", "D) Substrate"], ans: 0 },
+            { q: "The inverting input terminal of an Op-Amp is denoted by which mathematical sign?", options: ["A) +", "B) -", "C) *", "D) ~"], ans: 1 },
+            { q: "How many unique counting states are there in a standard Decade Counter?", options: ["A) 8", "B) 10", "C) 12", "D) 16"], ans: 1 },
+            { q: "Compared to a BJT, a JFET (Junction Field Effect Transistor) has a significantly higher:", options: ["A) Output current", "B) Power dissipation", "C) Input impedance", "D) Voltage drop"], ans: 2 },
+            { q: "A TRIAC is best described as a:", options: ["A) Unidirectional thyristor", "B) Bidirectional thyristor", "C) Voltage regulator", "D) Fixed resistor"], ans: 1 },
+            { q: "In a basic computer system, the physical chip acting as the CPU is called a:", options: ["A) Microcontroller", "B) Microprocessor", "C) Memory Module", "D) Shift Register"], ans: 1 },
+            { q: "In modern PCB design, SMD stands for:", options: ["A) System Memory Device", "B) Surface Mount Device", "C) Silicon Metal Diode", "D) Symmetrical Matrix Display"], ans: 1 },
+            { q: "A battery is an active component that converts:", options: ["A) Electrical energy to chemical energy", "B) Chemical energy to electrical energy", "C) Thermal energy to electrical energy", "D) Mechanical energy to electrical energy"], ans: 1 },
+            { q: "A digital Multiplexer (MUX) is a circuit that has:", options: ["A) One input and many outputs", "B) Many inputs and many outputs", "C) Many inputs and one output", "D) One input and one output"], ans: 2 },
+            { q: "Watt is the standard unit of measurement for:", options: ["A) Electrical Energy", "B) Electrical Power", "C) Potential Difference", "D) Magnetic Flux"], ans: 1 },
+            { q: "Kirchhoff's Voltage Law (KVL) is based on the principle of conservation of:", options: ["A) Charge", "B) Mass", "C) Momentum", "D) Energy"], ans: 3 }
+        ],
+        3: [
+            { q: "According to the Maximum Power Transfer Theorem, maximum power is delivered to a load when:", options: ["A) Load resistance is zero", "B) Load resistance is infinite", "C) Load resistance equals source resistance", "D) Load resistance is twice the source resistance"], ans: 2 },
+            { q: "An ideal voltage source has an internal resistance of:", options: ["A) Zero", "B) Infinite", "C) 1 Ohm", "D) 100 Ohms"], ans: 0 },
+            { q: "Which of the following is an example of a passive component?", options: ["A) BJT", "B) SCR", "C) Transformer", "D) Operational Amplifier"], ans: 2 },
+            { q: "The depletion region of a PN junction diode contains:", options: ["A) Free electrons only", "B) Holes only", "C) Both free electrons and holes", "D) Immobile ions"], ans: 3 },
+            { q: "What is the primary function of a filter circuit in a power supply?", options: ["A) To step down voltage", "B) To convert AC to DC", "C) To remove ripples from the rectified output", "D) To regulate the output voltage"], ans: 2 },
+            { q: "In a Common Base (CB) transistor configuration, the current gain is denoted by:", options: ["A) Alpha (α)", "B) Beta (β)", "C) Gamma (γ)", "D) Delta (δ)"], ans: 0 },
+            { q: "Which oscillator uses a tapped inductor in its feedback network?", options: ["A) Colpitts Oscillator", "B) Hartley Oscillator", "C) Phase Shift Oscillator", "D) Wien Bridge Oscillator"], ans: 1 },
+            { q: "The Common Mode Rejection Ratio (CMRR) of an ideal Op-Amp should be:", options: ["A) Zero", "B) Unity", "C) Infinite", "D) 100 dB"], ans: 2 },
+            { q: "Which logic family is known for having the lowest power dissipation?", options: ["A) TTL", "B) ECL", "C) DTL", "D) CMOS"], ans: 3 },
+            { q: "Convert the binary number 1010 to decimal:", options: ["A) 8", "B) 10", "C) 12", "D) 14"], ans: 1 },
+            { q: "A multiplexer with 4 select lines can handle how many data inputs?", options: ["A) 4", "B) 8", "C) 16", "D) 32"], ans: 2 },
+            { q: "In an AC circuit, the ratio of Real Power to Apparent Power is called:", options: ["A) Form Factor", "B) Peak Factor", "C) Quality Factor", "D) Power Factor"], ans: 3 },
+            { q: "The fundamental unit of magnetic flux is the:", options: ["A) Tesla", "B) Weber", "C) Gauss", "D) Oersted"], ans: 1 },
+            { q: "Which device is commonly used to protect circuits from high voltage spikes?", options: ["A) Zener Diode", "B) Varistor (MOV)", "C) Light Emitting Diode", "D) Tunnel Diode"], ans: 1 },
+            { q: "In a Microprocessor, the ALU is responsible for:", options: ["A) Storing data", "B) Arithmetic and Logical operations", "C) Fetching instructions", "D) Controlling memory"], ans: 1 },
+            { q: "A 555 timer configured in astable mode functions as a:", options: ["A) One-shot multivibrator", "B) Free-running oscillator", "C) Bistable latch", "D) Voltage regulator"], ans: 1 },
+            { q: "The breakdown mechanism in a heavily doped PN junction is called:", options: ["A) Avalanche breakdown", "B) Zener breakdown", "C) Thermal breakdown", "D) Secondary breakdown"], ans: 1 },
+            { q: "What does AM stand for in radio communication?", options: ["A) Amplitude Modulation", "B) Audio Modulation", "C) Antenna Matching", "D) Active Modulation"], ans: 0 },
+            { q: "Which material has a negative temperature coefficient of resistance?", options: ["A) Copper", "B) Aluminum", "C) Silicon", "D) Silver"], ans: 2 },
+            { q: "A flip-flop that toggles its state on every clock pulse is the:", options: ["A) D Flip-Flop", "B) SR Flip-Flop", "C) T Flip-Flop", "D) JK Flip-Flop (with inputs at 0)"], ans: 2 },
+            { q: "The bandwidth of an ideal operational amplifier is:", options: ["A) 0 Hz", "B) 1 MHz", "C) Infinite", "D) 100 kHz"], ans: 2 },
+            { q: "Which component stores energy in the form of an electrostatic field?", options: ["A) Inductor", "B) Capacitor", "C) Resistor", "D) Transformer"], ans: 1 },
+            { q: "The speed of a DC motor can be controlled by varying:", options: ["A) The armature voltage", "B) The field current", "C) Both A and B", "D) The number of poles"], ans: 2 },
+            { q: "In digital electronics, an inverter is another name for a:", options: ["A) AND Gate", "B) OR Gate", "C) NOT Gate", "D) NAND Gate"], ans: 2 },
+            { q: "Which type of ADC (Analog-to-Digital Converter) is the fastest?", options: ["A) Successive Approximation", "B) Dual Slope", "C) Flash ADC", "D) Counter type"], ans: 2 }
+        ],
+        4: [
+            { q: "The unit of electrical conductance is:", options: ["A) Ohm", "B) Mho (Siemens)", "C) Farad", "D) Henry"], ans: 1 },
+            { q: "A pure inductor in an AC circuit causes the current to:", options: ["A) Lead the voltage by 90 degrees", "B) Lag the voltage by 90 degrees", "C) Be in phase with the voltage", "D) Lag the voltage by 180 degrees"], ans: 1 },
+            { q: "The core of a transformer is laminated to reduce:", options: ["A) Copper losses", "B) Eddy current losses", "C) Hysteresis losses", "D) Flux leakage"], ans: 1 },
+            { q: "Which transistor configuration provides the highest voltage gain?", options: ["A) Common Base (CB)", "B) Common Emitter (CE)", "C) Common Collector (CC)", "D) They all provide the same gain"], ans: 1 },
+            { q: "In a JFET, the control terminal is called the:", options: ["A) Base", "B) Emitter", "C) Gate", "D) Drain"], ans: 2 },
+            { q: "Which type of feedback is generally used in amplifier circuits to improve stability?", options: ["A) Positive Feedback", "B) Negative Feedback", "C) Zero Feedback", "D) Infinite Feedback"], ans: 1 },
+            { q: "The slew rate of an Op-Amp is typically expressed in:", options: ["A) V/µs", "B) A/µs", "C) V/s", "D) W/ms"], ans: 0 },
+            { q: "A logic circuit that adds two single-bit numbers and produces a Sum and a Carry is called a:", options: ["A) Full Adder", "B) Half Adder", "C) Multiplexer", "D) Decoder"], ans: 1 },
+            { q: "What is the 2's complement of the binary number 0101?", options: ["A) 1010", "B) 1011", "C) 1100", "D) 1111"], ans: 1 },
+            { q: "A decade counter requires a minimum of how many flip-flops?", options: ["A) 2", "B) 3", "C) 4", "D) 5"], ans: 2 },
+            { q: "Which communication system uses multiple frequencies to transmit data simultaneously?", options: ["A) AM", "B) FM", "C) FDM", "D) TDM"], ans: 2 },
+            { q: "In optical fibers, signal transmission relies on the principle of:", options: ["A) Total internal reflection", "B) Refraction", "C) Diffraction", "D) Dispersion"], ans: 0 },
+            { q: "What does SCR stand for in power electronics?", options: ["A) Silicon Controlled Rectifier", "B) Silicon Current Regulator", "C) Semiconductor Controlled Rectifier", "D) Synchronous Current Rectifier"], ans: 0 },
+            { q: "An SCR is a layered device with how many PN junctions?", options: ["A) 1", "B) 2", "C) 3", "D) 4"], ans: 2 },
+            { q: "Which microcontroller family does the ATmega328P (used in Arduino Uno) belong to?", options: ["A) PIC", "B) AVR", "C) ARM", "D) 8051"], ans: 1 },
+            { q: "Which instrument is used to visualize the waveform of electrical signals?", options: ["A) Multimeter", "B) Function Generator", "C) Oscilloscope", "D) Spectrum Analyzer"], ans: 2 },
+            { q: "A component that converts a non-electrical physical quantity into an electrical signal is a:", options: ["A) Transformer", "B) Transducer", "C) Transistor", "D) Thyristor"], ans: 1 },
+            { q: "Thermocouples are primarily used to measure:", options: ["A) Pressure", "B) Light intensity", "C) Humidity", "D) Temperature"], ans: 3 },
+            { q: "The process of systematically finding and fixing faults in an electronic circuit is called:", options: ["A) Prototyping", "B) Troubleshooting", "C) Soldering", "D) Modulation"], ans: 1 },
+            { q: "Which logic gate's output is LOW only when all its inputs are HIGH?", options: ["A) AND", "B) OR", "C) NAND", "D) NOR"], ans: 2 },
+            { q: "A photodiode operates in which biasing mode to detect light?", options: ["A) Forward bias", "B) Reverse bias", "C) Zero bias", "D) Alternating bias"], ans: 1 },
+            { q: "Which of the following materials is a good insulator?", options: ["A) Copper", "B) Gold", "C) Glass", "D) Germanium"], ans: 2 },
+            { q: "What is the equivalent resistance of two 10-Ohm resistors connected in parallel?", options: ["A) 5 Ohms", "B) 10 Ohms", "C) 20 Ohms", "D) 100 Ohms"], ans: 0 },
+            { q: "Which network theorem states that any linear, bilateral DC network can be reduced to a single voltage source in series with a single resistor?", options: ["A) Norton's Theorem", "B) Thevenin's Theorem", "C) Superposition Theorem", "D) Millman's Theorem"], ans: 1 },
+            { q: "What is the typical logic HIGH voltage for a 5V standard TTL circuit?", options: ["A) 0V to 0.8V", "B) 1.5V to 2.0V", "C) 2.0V to 5.0V", "D) Exactly 5.0V"], ans: 2 }
+        ],
+        5: [
+            { q: "In a series resonant RLC circuit, the impedance at the resonant frequency is:", options: ["A) Maximum", "B) Minimum", "C) Zero", "D) Infinite"], ans: 1 },
+            { q: "The Q-factor (Quality Factor) of a resonant circuit determines its:", options: ["A) Power dissipation", "B) Bandwidth and sharpness of resonance", "C) Total current", "D) Maximum voltage rating"], ans: 1 },
+            { q: "Which type of diode is designed to exhibit variable capacitance depending on the applied reverse bias voltage?", options: ["A) Tunnel Diode", "B) Varactor Diode", "C) Schottky Diode", "D) LED"], ans: 1 },
+            { q: "Which power amplifier class provides the highest theoretical efficiency (up to 78.5%) for analog signals?", options: ["A) Class A", "B) Class B", "C) Class AB", "D) Class C"], ans: 1 },
+            { q: "An operational amplifier operating as a comparator is typically used in which configuration?", options: ["A) Open-loop", "B) Closed-loop with negative feedback", "C) Closed-loop with positive feedback", "D) Voltage follower"], ans: 0 },
+            { q: "De Morgan's First Theorem states that (A + B)' is equivalent to:", options: ["A) A' + B'", "B) A' . B'", "C) A . B", "D) A + B"], ans: 1 },
+            { q: "A Shift Register is primarily constructed using:", options: ["A) Logic Gates", "B) Flip-Flops", "C) Op-Amps", "D) Inductors"], ans: 1 },
+            { q: "Convert the hexadecimal number 1A to decimal:", options: ["A) 16", "B) 26", "C) 36", "D) 46"], ans: 1 },
+            { q: "In FM (Frequency Modulation), what property of the carrier wave is varied in accordance with the message signal?", options: ["A) Amplitude", "B) Phase", "C) Frequency", "D) Power"], ans: 2 },
+            { q: "The most commonly used method to generate a Single Sideband (SSB) signal is the:", options: ["A) Envelope detection method", "B) Filter method", "C) Ratio detector method", "D) Superheterodyne method"], ans: 1 },
+            { q: "Which device is triggered into conduction by a voltage pulse applied to its Gate terminal?", options: ["A) Diac", "B) Triac", "C) SCR", "D) Both B and C"], ans: 3 },
+            { q: "A chopper circuit in power electronics is essentially a:", options: ["A) AC to DC converter", "B) DC to AC converter", "C) DC to DC converter", "D) AC to AC converter"], ans: 2 },
+            { q: "The instruction set of a microprocessor determines:", options: ["A) Its clock speed", "B) Its physical size", "C) The commands it can understand and execute", "D) Its power consumption"], ans: 2 },
+            { q: "In the 8085 microprocessor, how many bit-wide is the data bus?", options: ["A) 4-bit", "B) 8-bit", "C) 16-bit", "D) 32-bit"], ans: 1 },
+            { q: "A Strain Gauge is a transducer used to measure:", options: ["A) Temperature", "B) Light", "C) Mechanical deformation or stress", "D) Magnetic field"], ans: 2 },
+            { q: "Which error in measurement occurs due to the friction of the meter movement or imperfect zero setting?", options: ["A) Gross Error", "B) Systematic Error", "C) Random Error", "D) Environmental Error"], ans: 1 },
+            { q: "Lenz's Law is a consequence of the law of conservation of:", options: ["A) Charge", "B) Mass", "C) Energy", "D) Momentum"], ans: 2 },
+            { q: "Which circuit component is used to smooth the pulsating DC output from a rectifier?", options: ["A) Filter capacitor", "B) Switching transistor", "C) Step-up transformer", "D) Logic gate"], ans: 0 },
+            { q: "An OR gate can be conceptualized using electrical switches connected in:", options: ["A) Series", "B) Parallel", "C) Series-Parallel", "D) Star configuration"], ans: 1 },
+            { q: "The term 'Biasing' in electronics refers to:", options: ["A) Setting the exact operating DC voltage/current of a device", "B) Adding a bypass capacitor", "C) Soldering components on a PCB", "D) Connecting to an AC mains supply"], ans: 0 },
+            { q: "A Darlington Pair transistor configuration is used to achieve:", options: ["A) High voltage gain", "B) High current gain", "C) High frequency response", "D) Low input impedance"], ans: 1 },
+            { q: "Which parameter is constant in a series circuit?", options: ["A) Voltage", "B) Resistance", "C) Current", "D) Power"], ans: 2 },
+            { q: "What is the primary advantage of a Switch Mode Power Supply (SMPS) over a linear power supply?", options: ["A) Simpler design", "B) Higher efficiency and smaller size", "C) Lower noise", "D) No magnetic components required"], ans: 1 },
+            { q: "A Hall Effect sensor is commonly used to detect:", options: ["A) Temperature changes", "B) Humidity levels", "C) Magnetic fields", "D) Acoustic waves"], ans: 2 },
+            { q: "In binary addition, 1 + 1 equals:", options: ["A) 0 with a carry of 0", "B) 1 with a carry of 0", "C) 0 with a carry of 1", "D) 1 with a carry of 1"], ans: 2 }
+        ],
+        6: [
+            { q: "The primary purpose of a bypass capacitor in a CE amplifier is to:", options: ["A) Filter the power supply", "B) Prevent DC from reaching the load", "C) Prevent reduction in AC voltage gain by shorting the emitter resistor for AC signals", "D) Improve high-frequency rejection"], ans: 2 },
+            { q: "An ideal ammeter should have an internal resistance of:", options: ["A) Zero", "B) 1 Ohm", "C) 100 Ohms", "D) Infinite"], ans: 0 },
+            { q: "A Phase-Locked Loop (PLL) is commonly used for:", options: ["A) Power amplification", "B) Frequency synthesis and demodulation", "C) Rectifying AC voltage", "D) Logical operations"], ans: 1 },
+            { q: "Which type of flip-flop solves the 'race-around' condition found in standard JK flip-flops?", options: ["A) D Flip-Flop", "B) T Flip-Flop", "C) Master-Slave JK Flip-Flop", "D) SR Latch"], ans: 2 },
+            { q: "A 4-bit binary counter can count up to a maximum decimal value of:", options: ["A) 4", "B) 8", "C) 15", "D) 16"], ans: 2 },
+            { q: "What is the primary function of a Demultiplexer (DeMUX)?", options: ["A) Convert multiple inputs to a single output", "B) Convert a single input to multiple outputs", "C) Add binary numbers", "D) Store data temporarily"], ans: 1 },
+            { q: "In a superheterodyne receiver, the intermediate frequency (IF) for standard AM radio is usually:", options: ["A) 455 kHz", "B) 10.7 MHz", "C) 88 MHz", "D) 50 Hz"], ans: 0 },
+            { q: "A coaxial cable is widely used for RF transmission because it:", options: ["A) Is very cheap", "B) Offers excellent shielding from external electromagnetic interference", "C) Operates entirely on optics", "D) Cannot transmit digital signals"], ans: 1 },
+            { q: "Which component is NOT a part of a standard DC motor?", options: ["A) Commutator", "B) Armature", "C) Slip rings", "D) Brushes"], ans: 2 },
+            { q: "An Inverter in power electronics is a device that converts:", options: ["A) AC to DC", "B) DC to AC", "C) Low DC to High DC", "D) Low AC to High AC"], ans: 1 },
+            { q: "A ROM (Read-Only Memory) is an example of:", options: ["A) Volatile memory", "B) Non-volatile memory", "C) Sequential memory", "D) Analog memory"], ans: 1 },
+            { q: "In a microprocessor, the Program Counter (PC) stores:", options: ["A) The data being processed", "B) The results of the ALU", "C) The address of the next instruction to be fetched", "D) The status flags"], ans: 2 },
+            { q: "An LVDT (Linear Variable Differential Transformer) is used to measure:", options: ["A) Rotary motion", "B) Temperature", "C) Linear displacement", "D) Fluid pressure"], ans: 2 },
+            { q: "Which type of bridge circuit is specifically used to measure unknown capacitance?", options: ["A) Wheatstone Bridge", "B) Maxwell Bridge", "C) Schering Bridge", "D) Kelvin Bridge"], ans: 2 },
+            { q: "The process of embedding impurities into a pure semiconductor to increase conductivity is called:", options: ["A) Depletion", "B) Biasing", "C) Doping", "D) Rectification"], ans: 2 },
+            { q: "Which law states that the induced EMF always opposes the change in magnetic flux that produced it?", options: ["A) Faraday's Law", "B) Lenz's Law", "C) Ampere's Law", "D) Coulomb's Law"], ans: 1 },
+            { q: "What type of switch is a standard light switch in a home?", options: ["A) SPST (Single Pole Single Throw)", "B) SPDT (Single Pole Double Throw)", "C) DPST (Double Pole Single Throw)", "D) DPDT (Double Pole Double Throw)"], ans: 0 },
+            { q: "A Schottky diode is characterized by its:", options: ["A) High reverse breakdown voltage", "B) Fast switching speed and low forward voltage drop", "C) Ability to emit coherent light", "D) Negative resistance region"], ans: 1 },
+            { q: "Which class of amplifier conducts for exactly 180 degrees (one half) of the input cycle?", options: ["A) Class A", "B) Class B", "C) Class AB", "D) Class C"], ans: 1 },
+            { q: "In Boolean algebra, A + A is equal to:", options: ["A) 2A", "B) 1", "C) 0", "D) A"], ans: 3 },
+            { q: "A device that protects sensitive electronic circuits by breaking the circuit when current exceeds a safe limit is a:", options: ["A) Relay", "B) Transformer", "C) Fuse", "D) Inductor"], ans: 2 },
+            { q: "When two 100 µF capacitors are connected in series, the total equivalent capacitance is:", options: ["A) 50 µF", "B) 100 µF", "C) 200 µF", "D) 10,000 µF"], ans: 0 },
+            { q: "What does the term 'Vcc' generally stand for in electronic schematics?", options: ["A) Voltage at the common collector", "B) Positive power supply voltage (often for BJT circuits)", "C) Negative ground reference", "D) Alternating current voltage"], ans: 1 },
+            { q: "A piezoelectric crystal produces an electrical voltage when subjected to:", options: ["A) Thermal stress", "B) Magnetic fields", "C) Mechanical pressure", "D) Light radiation"], ans: 2 },
+            { q: "Which instrument provides a visual representation of frequency spectrum components?", options: ["A) Oscilloscope", "B) Logic Analyzer", "C) Spectrum Analyzer", "D) Function Generator"], ans: 2 }
+        ],
+        7: [
+            { q: "The voltage gain of a non-inverting operational amplifier is given by the formula:", options: ["A) -Rf/Rin", "B) 1 + (Rf/Rin)", "C) Rf/Rin", "D) 1 - (Rf/Rin)"], ans: 1 },
+            { q: "Which type of memory is volatile and loses its contents when power is removed?", options: ["A) ROM", "B) PROM", "C) RAM", "D) EEPROM"], ans: 2 },
+            { q: "In an NPN transistor, the arrow on the emitter symbol points:", options: ["A) Inward towards the base", "B) Outward away from the base", "C) Towards the collector", "D) There is no arrow on an NPN transistor"], ans: 1 },
+            { q: "What is the primary advantage of a Bridge Rectifier over a Center-Tapped Full-Wave Rectifier?", options: ["A) It uses fewer diodes", "B) It does not require a center-tapped transformer", "C) It produces less heat", "D) It has a higher ripple factor"], ans: 1 },
+            { q: "The process of converting a continuous analog signal into discrete digital levels is called:", options: ["A) Sampling", "B) Quantization", "C) Encoding", "D) Multiplexing"], ans: 1 },
+            { q: "Which basic logic gate can be used as an inverter if its inputs are tied together?", options: ["A) AND Gate", "B) OR Gate", "C) NAND Gate", "D) XOR Gate"], ans: 2 },
+            { q: "The minimum number of diodes required to design a clipping circuit is:", options: ["A) 1", "B) 2", "C) 3", "D) 4"], ans: 0 },
+            { q: "What is the duty cycle of a perfect square wave?", options: ["A) 0%", "B) 25%", "C) 50%", "D) 100%"], ans: 2 },
+            { q: "Which component is used to store data in an SRAM (Static RAM)?", options: ["A) Capacitors", "B) Flip-Flops", "C) Inductors", "D) Magnetic Cores"], ans: 1 },
+            { q: "An ideal voltmeter should have an internal resistance of:", options: ["A) Zero", "B) 100 Ohms", "C) 1 MegaOhm", "D) Infinite"], ans: 3 },
+            { q: "In a communications system, what is the function of a demodulator?", options: ["A) To mix two signals", "B) To amplify the carrier wave", "C) To extract the original message signal from the carrier", "D) To increase the frequency of the signal"], ans: 2 },
+            { q: "What does the term 'CMRR' stand for in Op-Amp terminology?", options: ["A) Common Mode Rejection Ratio", "B) Constant Maximum Rectification Rate", "C) Current Mode Regulation Ratio", "D) Capacitive Mutual Reactance Ratio"], ans: 0 },
+            { q: "Which material is a commonly used dielectric in ceramic capacitors?", options: ["A) Aluminum Oxide", "B) Tantalum", "C) Barium Titanate", "D) Teflon"], ans: 2 },
+            { q: "The logic expression A.(B+C) = A.B + A.C is an example of the:", options: ["A) Commutative Law", "B) Associative Law", "C) Distributive Law", "D) De Morgan's Law"], ans: 2 },
+            { q: "In an AC circuit, the power consumed by a pure capacitor is:", options: ["A) Maximum", "B) Infinite", "C) Zero", "D) Equal to V x I"], ans: 2 },
+            { q: "Which semiconductor device can be turned on by a gate pulse and turned off only by reducing the current below the holding current?", options: ["A) BJT", "B) MOSFET", "C) SCR", "D) IGBT"], ans: 2 },
+            { q: "A 3-to-8 line decoder will have how many input lines?", options: ["A) 2", "B) 3", "C) 8", "D) 11"], ans: 1 },
+            { q: "A resonant circuit is often referred to as a:", options: ["A) Tank circuit", "B) Rectifier circuit", "C) Clipper circuit", "D) Chopper circuit"], ans: 0 },
+            { q: "Which parameter is critical in determining the speed of a microprocessor?", options: ["A) Operating Voltage", "B) Clock Frequency", "C) ROM size", "D) Number of I/O pins"], ans: 1 },
+            { q: "A galvanometer can be converted into a voltmeter by connecting a:", options: ["A) Low resistance in series", "B) High resistance in series", "C) Low resistance in parallel", "D) High resistance in parallel"], ans: 1 },
+            { q: "Which diode operates in the reverse breakdown region to maintain a constant voltage?", options: ["A) Tunnel Diode", "B) PIN Diode", "C) Zener Diode", "D) Schottky Diode"], ans: 2 },
+            { q: "The time required for a signal to change from 10% to 90% of its final value is called:", options: ["A) Fall time", "B) Delay time", "C) Storage time", "D) Rise time"], ans: 3 },
+            { q: "In a transformer, the winding connected to the power source is called the:", options: ["A) Secondary winding", "B) Primary winding", "C) Tertiary winding", "D) Output winding"], ans: 1 },
+            { q: "A circuit that produces an output waveform without any external AC input signal is an:", options: ["A) Amplifier", "B) Oscillator", "C) Attenuator", "D) Integrator"], ans: 1 },
+            { q: "Which of the following describes a 'short circuit'?", options: ["A) Infinite resistance, zero current", "B) Zero resistance, maximum current", "C) High voltage, low current", "D) Nominal resistance, nominal current"], ans: 1 }
+        ],
+        8: [
+            { q: "What is the primary function of a clamping circuit?", options: ["A) To remove a portion of the waveform", "B) To add a DC level to an AC signal", "C) To amplify the signal", "D) To rectify the signal"], ans: 1 },
+            { q: "In digital logic, what does the acronym 'LSB' stand for?", options: ["A) Logical Standard Byte", "B) Least Significant Bit", "C) Low State Binary", "D) Linear Shift Base"], ans: 1 },
+            { q: "The depletion mode of operation is possible in which type of FET?", options: ["A) Enhancement MOSFET only", "B) JFET only", "C) Both JFET and Depletion MOSFET", "D) None of the above"], ans: 2 },
+            { q: "What happens to the resistance of a pure semiconductor (like Silicon) when its temperature increases?", options: ["A) It increases", "B) It decreases", "C) It remains constant", "D) It becomes infinite"], ans: 1 },
+            { q: "A logic circuit whose output depends not only on present inputs but also on past inputs is called a:", options: ["A) Combinational circuit", "B) Sequential circuit", "C) Linear circuit", "D) Passive circuit"], ans: 1 },
+            { q: "Which IC is commonly known as a Quad 2-Input NAND Gate?", options: ["A) 7400", "B) 7402", "C) 7404", "D) 7408"], ans: 0 },
+            { q: "To increase the voltage range of a DC voltmeter, what must be added?", options: ["A) A multiplier resistance in series", "B) A shunt resistance in parallel", "C) A capacitor in series", "D) An inductor in parallel"], ans: 0 },
+            { q: "The ripple frequency of a 50 Hz full-wave rectifier is:", options: ["A) 25 Hz", "B) 50 Hz", "C) 100 Hz", "D) 200 Hz"], ans: 2 },
+            { q: "A thyristor (SCR) can be turned off by:", options: ["A) Removing the gate pulse", "B) Applying a negative gate pulse", "C) Reducing the anode current below the holding current", "D) Increasing the anode voltage"], ans: 2 },
+            { q: "In an inverting operational amplifier, the phase shift between input and output is:", options: ["A) 0 degrees", "B) 90 degrees", "C) 180 degrees", "D) 360 degrees"], ans: 2 },
+            { q: "Which transmission medium has the highest bandwidth?", options: ["A) Twisted pair cable", "B) Coaxial cable", "C) Free space (RF)", "D) Fiber optic cable"], ans: 3 },
+            { q: "What is the base of the Octal number system?", options: ["A) 2", "B) 8", "C) 10", "D) 16"], ans: 1 },
+            { q: "Which transducer works on the principle of change in resistance due to physical elongation?", options: ["A) Thermistor", "B) LVDT", "C) Strain Gauge", "D) Photodiode"], ans: 2 },
+            { q: "A 555 timer configured as a monostable multivibrator acts as a:", options: ["A) Free-running oscillator", "B) One-shot timer", "C) Flip-Flop", "D) Voltage comparator"], ans: 1 },
+            { q: "What is the equivalent capacitance of three 3µF capacitors connected in series?", options: ["A) 1 µF", "B) 3 µF", "C) 6 µF", "D) 9 µF"], ans: 0 },
+            { q: "Which layer of the ionosphere is most important for high-frequency (HF) radio wave propagation?", options: ["A) D layer", "B) E layer", "C) F layer", "D) Troposphere"], ans: 2 },
+            { q: "The most commonly used alloy for electronic soldering is a mixture of:", options: ["A) Tin and Copper", "B) Lead and Silver", "C) Tin and Lead", "D) Copper and Zinc"], ans: 2 },
+            { q: "Which motor is commonly used in hard disk drives and robotics for precise angular positioning?", options: ["A) AC Induction Motor", "B) DC Series Motor", "C) Stepper Motor", "D) Universal Motor"], ans: 2 },
+            { q: "In a BJT, the relation between Alpha (α) and Beta (β) is:", options: ["A) β = α / (1 - α)", "B) β = α / (1 + α)", "C) α = β * (1 - β)", "D) α = 1 / β"], ans: 0 },
+            { q: "Which device is used to isolate a low-voltage control circuit from a high-voltage power circuit?", options: ["A) Optocoupler", "B) Diode", "C) Capacitor", "D) Zener Regulator"], ans: 0 },
+            { q: "An ADC (Analog to Digital Converter) with an 8-bit resolution can distinguish how many distinct voltage levels?", options: ["A) 8", "B) 16", "C) 128", "D) 256"], ans: 3 },
+            { q: "Which law states that the algebraic sum of voltages around any closed loop in a circuit is zero?", options: ["A) Ohm's Law", "B) Kirchhoff's Current Law (KCL)", "C) Kirchhoff's Voltage Law (KVL)", "D) Thevenin's Law"], ans: 2 },
+            { q: "The function of a commutator in a DC generator is to:", options: ["A) Increase the generated voltage", "B) Convert AC induced in the armature to DC output", "C) Reduce sparking at the brushes", "D) Provide mechanical support"], ans: 1 },
+            { q: "What does the term 'SMD' stand for in printed circuit board assembly?", options: ["A) System Memory Device", "B) Surface Mount Device", "C) Silicon Molded Diode", "D) Static Magnetic Domain"], ans: 1 },
+            { q: "In an LC tank circuit, if the capacitance is increased by four times, the resonant frequency will:", options: ["A) Double", "B) Quadruple", "C) Be halved", "D) Remain unchanged"], ans: 2 }
+        ],
+        9: [
+            { q: "What is the primary purpose of a Heat Sink in an electronic circuit?", options: ["A) To increase the operating temperature", "B) To dissipate excess heat away from sensitive components", "C) To protect the circuit from cold environments", "D) To conduct electrical current to the chassis"], ans: 1 },
+            { q: "A logic gate with an output that is HIGH only when its two inputs are different is the:", options: ["A) AND Gate", "B) NAND Gate", "C) XOR Gate", "D) XNOR Gate"], ans: 2 },
+            { q: "Which diode is commonly used as an electronic tuning element in radio receivers?", options: ["A) Zener Diode", "B) Varactor Diode", "C) Tunnel Diode", "D) LED"], ans: 1 },
+            { q: "In an Operational Amplifier, what is the term for the maximum rate at which the output voltage can change?", options: ["A) Gain-Bandwidth Product", "B) Input Offset Voltage", "C) Slew Rate", "D) Common Mode Rejection Ratio"], ans: 2 },
+            { q: "What is the binary equivalent of the decimal number 15?", options: ["A) 1010", "B) 1100", "C) 1110", "D) 1111"], ans: 3 },
+            { q: "A 8051 Microcontroller is an example of an architecture that is:", options: ["A) 4-bit", "B) 8-bit", "C) 16-bit", "D) 32-bit"], ans: 1 },
+            { q: "To convert an analog signal to digital, the sampling frequency must be at least twice the highest frequency component of the signal. This is known as:", options: ["A) Shannon's Law", "B) Nyquist Criterion", "C) Fourier's Theorem", "D) Bode's Rule"], ans: 1 },
+            { q: "Which type of capacitor is generally polarized and must be installed in the correct orientation?", options: ["A) Ceramic Capacitor", "B) Mica Capacitor", "C) Electrolytic Capacitor", "D) Film Capacitor"], ans: 2 },
+            { q: "In a BJT, if the base-emitter junction is forward-biased and the base-collector junction is reverse-biased, the transistor is in:", options: ["A) Cutoff region", "B) Saturation region", "C) Active region", "D) Breakdown region"], ans: 2 },
+            { q: "Which instrument is used to measure the power consumed by a load in an AC circuit?", options: ["A) Ammeter", "B) Voltmeter", "C) Ohmmeter", "D) Wattmeter"], ans: 3 },
+            { q: "The logic expression for a NAND gate with inputs A and B is:", options: ["A) Y = A + B", "B) Y = (A.B)'", "C) Y = (A+B)'", "D) Y = A.B"], ans: 1 },
+            { q: "In fiber optics, the core has a refractive index that is ________ than the cladding.", options: ["A) Higher", "B) Lower", "C) Equal to", "D) Unrelated to"], ans: 0 },
+            { q: "Which oscillator is highly prized for its extreme frequency stability?", options: ["A) Hartley Oscillator", "B) Colpitts Oscillator", "C) RC Phase Shift Oscillator", "D) Crystal Oscillator"], ans: 3 },
+            { q: "A 'Buck' converter in power electronics is used to:", options: ["A) Step up DC voltage", "B) Step down DC voltage", "C) Invert DC to AC", "D) Convert AC to DC"], ans: 1 },
+            { q: "What is the unit of Apparent Power in an AC circuit?", options: ["A) Watts (W)", "B) Volt-Amperes Reactive (VAR)", "C) Volt-Amperes (VA)", "D) Joules (J)"], ans: 2 },
+            { q: "In microcontrollers, what does the acronym 'EEPROM' stand for?", options: ["A) Electrically Erasable Programmable Read-Only Memory", "B) Electronically Executed Programmable Read-Only Memory", "C) Erasable Embedded Programmable Read-Only Memory", "D) Extended Erasable Programmable Read-Only Memory"], ans: 0 },
+            { q: "Which electronic component opposes a change in voltage across its terminals?", options: ["A) Resistor", "B) Inductor", "C) Capacitor", "D) Diode"], ans: 2 },
+            { q: "What is the primary function of a 'buffer' amplifier?", options: ["A) Voltage amplification", "B) Current attenuation", "C) Impedance matching (isolation)", "D) Frequency multiplication"], ans: 2 },
+            { q: "Which modulation technique is most commonly used in Wi-Fi and digital television transmission?", options: ["A) AM", "B) FM", "C) QAM / OFDM", "D) PWM"], ans: 2 },
+            { q: "A circuit that adds a DC offset to an AC signal without changing its shape is called a:", options: ["A) Clipper", "B) Clamper", "C) Rectifier", "D) Chopper"], ans: 1 },
+            { q: "In a half-adder, the 'Sum' output is generated by which logic gate?", options: ["A) AND", "B) OR", "C) XOR", "D) NAND"], ans: 2 },
+            { q: "The 'Skin Effect' in conductors refers to:", options: ["A) Current flowing more on the surface at high frequencies", "B) Insulation breakdown at high voltages", "C) Conductor melting at high currents", "D) Resistance decrease at low temperatures"], ans: 0 },
+            { q: "Which semiconductor device emits coherent, monochromatic light?", options: ["A) LED", "B) Photodiode", "C) Laser Diode", "D) Zener Diode"], ans: 2 },
+            { q: "The standard supply voltage for the TTL logic family is:", options: ["A) +3.3V", "B) +5V", "C) +12V", "D) -5V"], ans: 1 },
+            { q: "Which electrical quantity describes the rate at which energy is transferred or consumed?", options: ["A) Voltage", "B) Current", "C) Power", "D) Impedance"], ans: 2 }
+        ],
+        10: [
+            { q: "Which of the following is a universal logic gate?", options: ["A) AND", "B) OR", "C) NOT", "D) NOR"], ans: 3 },
+            { q: "In an N-Channel JFET, the charge carriers flowing between Source and Drain are:", options: ["A) Holes", "B) Electrons", "C) Both Holes and Electrons", "D) Ions"], ans: 1 },
+            { q: "What is the equivalent resistance of three 100-Ohm resistors connected in parallel?", options: ["A) 33.3 Ohms", "B) 100 Ohms", "C) 300 Ohms", "D) 1000 Ohms"], ans: 0 },
+            { q: "In an Operational Amplifier, the Virtual Ground concept applies to which configuration?", options: ["A) Inverting Amplifier", "B) Non-Inverting Amplifier", "C) Voltage Follower", "D) Schmitt Trigger"], ans: 0 },
+            { q: "Which component is utilized to convert electrical energy into acoustic waves (sound)?", options: ["A) Microphone", "B) Piezoelectric buzzer / Speaker", "C) Thermistor", "D) LDR"], ans: 1 },
+            { q: "The hexadecimal number 'F' is equivalent to which decimal number?", options: ["A) 10", "B) 12", "C) 14", "D) 15"], ans: 3 },
+            { q: "In communication systems, noise is most likely to affect which type of modulation?", options: ["A) Frequency Modulation (FM)", "B) Phase Modulation (PM)", "C) Amplitude Modulation (AM)", "D) Pulse Code Modulation (PCM)"], ans: 2 },
+            { q: "Which power supply topology is best suited for achieving very low output ripple and high stability without switching noise?", options: ["A) Buck Converter", "B) Boost Converter", "C) Linear Regulated Power Supply", "D) SMPS"], ans: 2 },
+            { q: "What is the primary function of the 'Hold' current in an SCR?", options: ["A) It is the maximum current the SCR can withstand", "B) It is the minimum gate current required to turn it on", "C) It is the minimum anode current required to keep the SCR in the ON state", "D) It is the leakage current when reversed biased"], ans: 2 },
+            { q: "A 555 timer has three internal resistors that create a voltage divider. What is the value of each resistor?", options: ["A) 1 kΩ", "B) 5 kΩ", "C) 10 kΩ", "D) 55 kΩ"], ans: 1 },
+            { q: "Which logic family utilizes both P-channel and N-channel MOSFETs arranged symmetrically?", options: ["A) TTL", "B) ECL", "C) CMOS", "D) DTL"], ans: 2 },
+            { q: "A circuit breaker performs a similar protective function to a:", options: ["A) Diode", "B) Resistor", "C) Fuse", "D) Capacitor"], ans: 2 },
+            { q: "What is the main advantage of using an optoisolator in a circuit?", options: ["A) Current amplification", "B) Electrical isolation between input and output", "C) Voltage regulation", "D) Frequency mixing"], ans: 1 },
+            { q: "Which type of flip-flop is commonly used to create shift registers and delay elements?", options: ["A) SR Flip-Flop", "B) JK Flip-Flop", "C) D Flip-Flop", "D) T Flip-Flop"], ans: 2 },
+            { q: "In a BJT operating in the active region, the collector current is roughly equal to the:", options: ["A) Base current", "B) Emitter current", "C) Leakage current", "D) Zero current"], ans: 1 },
+            { q: "What is the primary use of a Wheatstone bridge?", options: ["A) Filtering high frequencies", "B) Measuring unknown resistance accurately", "C) Amplifying small signals", "D) Rectifying AC to DC"], ans: 1 },
+            { q: "The unit of measurement for Magnetic Flux Density is the:", options: ["A) Weber", "B) Henry", "C) Tesla", "D) Ampere-turn"], ans: 2 },
+            { q: "In Arduino and other microcontrollers, PWM stands for:", options: ["A) Pulse Wave Modulation", "B) Pulse Width Modulation", "C) Power Width Measurement", "D) Phase Wave Multiplexing"], ans: 1 },
+            { q: "Which of the following is NOT a typical characteristic of an ideal Operational Amplifier?", options: ["A) Infinite input impedance", "B) Zero output impedance", "C) Infinite open-loop gain", "D) Finite bandwidth"], ans: 3 },
+            { q: "The time constant (τ) of an RC circuit is calculated as:", options: ["A) R / C", "B) C / R", "C) R * C", "D) 1 / (R * C)"], ans: 2 },
+            { q: "Which type of antenna is commonly used for satellite TV reception?", options: ["A) Dipole antenna", "B) Yagi-Uda antenna", "C) Parabolic dish antenna", "D) Loop antenna"], ans: 2 },
+            { q: "What does the color band 'Gold' represent when used as the multiplier on a resistor?", options: ["A) x 0.1", "B) x 0.01", "C) x 10", "D) ± 5% tolerance"], ans: 0 },
+            { q: "An oscilloscope is set to a time base of 1 ms/div. If one complete cycle of a waveform occupies 5 horizontal divisions, what is the frequency?", options: ["A) 50 Hz", "B) 100 Hz", "C) 200 Hz", "D) 500 Hz"], ans: 2 },
+            { q: "Which theorem states that any two-terminal linear complex network can be replaced by an equivalent circuit consisting of a current source and a parallel resistor?", options: ["A) Thevenin's Theorem", "B) Norton's Theorem", "C) Maximum Power Transfer Theorem", "D) Superposition Theorem"], ans: 1 },
+            { q: "In a standard desktop computer power supply, which color wire typically carries the +5V DC voltage?", options: ["A) Yellow", "B) Black", "C) Red", "D) Orange"], ans: 2 }
+        ]
+    };
+
+    // --- STATE VARIABLES ---
+    let currentSet = 1;
+    let timerInterval;
+    let timeRemaining = 1800; // 30 mins * 60 seconds
+    const totalQuestions = 25;
+    let userResults = {}; 
+
+    // --- INITIALIZATION ---
+    window.onload = () => {
+        const setContainer = document.getElementById("set-buttons");
+        for (let i = 1; i <= 10; i++) {
+            let btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Start Set " + i;
+            
+            // All sets are now fully populated!
+            if(testData[i].length < 25) {
+                btn.disabled = true;
+                btn.innerText += " (Coming Soon)";
+            }
+            
+            btn.onclick = () => startTest(i);
+            setContainer.appendChild(btn);
+        }
+    };
+
+    // --- TEST LOGIC ---
+    function startTest(setNum) {
+        currentSet = setNum;
+        timeRemaining = 1800;
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("test-view").style.display = "block";
+        document.getElementById("set-title").innerText = "Electronics Mock Test - Set " + setNum;
+        
+        renderQuestions();
+        startTimer();
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions-container");
+        container.innerHTML = "";
+        let questions = testData[currentSet];
+        
+        questions.forEach((qObj, index) => {
+            let qDiv = document.createElement("div");
+            qDiv.className = "question-card";
+            
+            let html = `<p>Q${index + 1}. ${qObj.q}</p><div class="options">`;
+            qObj.options.forEach((opt, optIndex) => {
+                html += `<label>
+                            <input type="radio" name="q${index}" value="${optIndex}"> 
+                            ${opt}
+                         </label>`;
+            });
+            html += `</div>`;
+            qDiv.innerHTML = html;
+            container.appendChild(qDiv);
+        });
+    }
+
+    // --- TIMER LOGIC ---
+    function startTimer() {
+        updateTimeDisplay();
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimeDisplay();
+            if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                alert("Time is up! Auto-submitting your test.");
+                calculateScore();
+            }
+        }, 1000);
+    }
+
+    function updateTimeDisplay() {
+        let minutes = Math.floor(timeRemaining / 60);
+        let seconds = timeRemaining % 60;
+        document.getElementById("time-display").innerText = 
+            (minutes < 10 ? "0" : "") + minutes + ":" + 
+            (seconds < 10 ? "0" : "") + seconds;
+    }
+
+    // --- SUBMISSION & GRADING ---
+    function manualSubmit() {
+        let answered = 0;
+        for (let i = 0; i < totalQuestions; i++) {
+            if (document.querySelector(`input[name="q${i}"]:checked`)) {
+                answered++;
+            }
+        }
+        
+        if (answered < totalQuestions) {
+            alert(`You have only answered ${answered} out of ${totalQuestions} questions. All questions are compulsory. Please answer the remaining questions.`);
+            return;
+        }
+
+        let confirmSubmit = confirm("Are you sure you want to submit?");
+        if (confirmSubmit) {
+            clearInterval(timerInterval);
+            calculateScore();
+        }
+    }
+
+    function calculateScore() {
+        let score = 0;
+        let questions = testData[currentSet];
+        
+        for (let i = 0; i < totalQuestions; i++) {
+            let selected = document.querySelector(`input[name="q${i}"]:checked`);
+            if (selected && parseInt(selected.value) === questions[i].ans) {
+                score++;
+            }
+        }
+
+        let percentage = (score / totalQuestions) * 100;
+        let status = percentage >= 50 ? "PASS" : "FAIL";
+        let statusClass = percentage >= 50 ? "pass" : "fail";
+
+        userResults[currentSet] = { score: score, percent: percentage, status: status };
+
+        document.getElementById("test-view").style.display = "none";
+        document.getElementById("result-view").style.display = "block";
+        
+        document.getElementById("result-details").innerHTML = `
+            <h3>Set ${currentSet} Result</h3>
+            <p style="font-size: 20px;">Score: <strong>${score} / ${totalQuestions}</strong></p>
+            <p style="font-size: 20px;">Percentage: <strong>${percentage}%</strong></p>
+            <p class="${statusClass}">${status}</p>
+        `;
+        
+        let btns = document.getElementById("set-buttons").getElementsByTagName("button");
+        btns[currentSet - 1].innerText = `Set ${currentSet} - ${score}/25`;
+        btns[currentSet - 1].style.backgroundColor = percentage >= 50 ? "#2ecc71" : "#e74c3c";
+    }
+
+    // --- NAVIGATION ---
+    function returnToDashboard() {
+        document.getElementById("result-view").style.display = "none";
+        document.getElementById("overall-view").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+    }
+
+    function showOverallResult() {
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("overall-view").style.display = "block";
+        
+        let container = document.getElementById("overall-table-container");
+        
+        if (Object.keys(userResults).length === 0) {
+            container.innerHTML = "<p style='text-align:center;'>No sets attempted yet.</p>";
+            return;
+        }
+
+        let html = `<table>
+            <tr>
+                <th>Set No.</th>
+                <th>Score (Out of 25)</th>
+                <th>Percentage</th>
+                <th>Result</th>
+            </tr>`;
+            
+        let totalScore = 0;
+        let attempted = 0;
+
+        for (let i = 1; i <= 10; i++) {
+            if (userResults[i]) {
+                attempted++;
+                totalScore += userResults[i].score;
+                let statusColor = userResults[i].status === "PASS" ? "green" : "red";
+                html += `<tr>
+                    <td>Set ${i}</td>
+                    <td>${userResults[i].score}</td>
+                    <td>${userResults[i].percent}%</td>
+                    <td style="color:${statusColor}; font-weight:bold;">${userResults[i].status}</td>
+                </tr>`;
+            }
+        }
+        
+        let overallPercent = ((totalScore / (attempted * 25)) * 100).toFixed(2);
+        let finalStatus = overallPercent >= 50 ? "PASS" : "FAIL";
+        let finalColor = overallPercent >= 50 ? "green" : "red";
+
+        html += `<tr style="background:#f1f1f1; font-weight:bold;">
+            <td>OVERALL</td>
+            <td>${totalScore} / ${attempted * 25}</td>
+            <td>${overallPercent}%</td>
+            <td style="color:${finalColor};">${finalStatus}</td>
+        </tr></table>`;
+        
+        container.innerHTML = html;
+    }
+</script>
+</body>
+</html>

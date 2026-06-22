@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium Practical Guides</title>
+
+<style>
+/* Reset & Base Styles */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body{
+    background-color: #f1f5f9; /* Soft light background */
+    color: #334155;
+    min-height: 100vh;
+}
+
+/* Stunning Gradient Header */
+.header{
+    background: linear-gradient(135deg, #1e1b4b, #4338ca, #3b82f6);
+    color: white;
+    text-align: center;
+    padding: 70px 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: #f1f5f9;
+    transform: skewY(-2deg);
+}
+
+.header h1{
+    font-size: 46px;
+    font-weight: 800;
+    margin-bottom: 15px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.header p{
+    font-size: 19px;
+    color: #e0e7ff;
+    font-weight: 300;
+}
+
+/* Main Layout Container */
+.container{
+    width: 95%;
+    max-width: 1150px;
+    margin: -30px auto 50px;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    display: flex;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    min-height: 550px;
+}
+
+/* Left Sidebar - Menu */
+.sidebar{
+    width: 28%;
+    background: #ffffff;
+    padding: 30px 20px;
+    border-right: 2px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Premium Pill-Shaped Buttons */
+.tab-btn{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 16px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 16px;
+    text-align: left;
+    font-size: 17px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-btn span {
+    font-size: 22px;
+}
+
+.tab-btn:hover{
+    background: #f8fafc;
+    color: #334155;
+    transform: translateX(5px);
+}
+
+/* Active State for Button */
+.tab-btn.active{
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    color: white;
+    box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+    transform: translateX(5px);
+}
+
+/* Right Content Area */
+.content-area{
+    width: 72%;
+    padding: 40px 50px;
+    background: #fafaf9;
+}
+
+.tab-content{
+    display: none;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.tab-content.active{
+    display: block;
+}
+
+@keyframes slideUpFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.content-header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.content-header h2{
+    color: #0f172a;
+    font-size: 34px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.content-header p{
+    font-size: 17px;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+/* --- Premium Practical Card UI --- */
+.practical-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.practical-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    transform: translateY(-4px);
+}
+
+.practical-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.icon-box {
+    background: #eef2ff;
+    color: #4f46e5;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 22px;
+}
+
+.practical-title h3 {
+    font-size: 22px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.info-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    align-items: flex-start;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    min-width: 90px;
+    text-align: center;
+    display: inline-block;
+}
+
+.badge.aim { background: #eef2ff; color: #4f46e5; }
+.badge.tools { background: #fef3c7; color: #d97706; }
+.badge.safety { background: #fee2e2; color: #ef4444; }
+
+.info-row p {
+    font-size: 16px;
+    color: #475569;
+    line-height: 1.5;
+    margin-top: 4px;
+}
+
+.steps-container {
+    background: #f8fafc;
+    padding: 20px 25px;
+    border-radius: 12px;
+    margin-top: 20px;
+    border-left: 4px solid #4f46e5;
+}
+
+.steps-container h4 {
+    color: #1e293b;
+    margin-bottom: 12px;
+    font-size: 17px;
+}
+
+.premium-step-list {
+    margin-left: 20px;
+    color: #475569;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.premium-step-list li {
+    margin-bottom: 8px;
+}
+
+.result-box {
+    margin-top: 20px;
+    background: #ecfdf5;
+    color: #047857;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border: 1px solid #a7f3d0;
+}
+
+.result-box strong {
+    color: #065f46;
+}
+
+/* Back Button */
+.back-btn{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 250px;
+    margin: 20px auto 60px;
+    text-decoration: none;
+    background: white;
+    color: #0f172a;
+    padding: 16px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    transition: 0.3s;
+    border: 2px solid transparent;
+}
+
+.back-btn:hover{
+    border-color: #4f46e5;
+    color: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 25px rgba(79, 70, 229, 0.15);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 850px) {
+    .container {
+        flex-direction: column;
+        margin-top: 20px;
+    }
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 2px solid #f1f5f9;
+        white-space: nowrap;
+    }
+    .tab-btn {
+        width: auto;
+        padding: 12px 20px;
+        transform: none !important;
+    }
+    .content-area {
+        width: 100%;
+        padding: 30px 20px;
+    }
+    .info-row {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .badge {
+        width: fit-content;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🛠️ Master Your Practical Labs</h1>
+    <p>Step-by-step interactive guides to perform jobs safely and efficiently.</p>
+</div>
+
+<div class="container">
+    
+    <!-- Left Sidebar Menu -->
+    <div class="sidebar">
+        <button class="tab-btn active" onclick="openTab(event, 'intro')">
+            <span>📌</span> Introduction
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'copa')">
+            <span>💻</span> COPA Lab
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'electrician')">
+            <span>⚡</span> Electrician Lab
+        </button>
+        <button class="tab-btn" onclick="openTab(event, 'electronics')">
+            <span>📡</span> Electronics Lab
+        </button>
+    </div>
+
+    <!-- Right Content Area -->
+    <div class="content-area">
+        
+        <!-- Intro Content -->
+        <div id="intro" class="tab-content active">
+            <div class="content-header">
+                <h2>The 5-Step Formula</h2>
+                <p>Every professional practical guide follows a strict format to ensure maximum safety and perfect output. Here is what every lab experiment includes:</p>
+            </div>
+            
+            <div class="practical-card">
+                <div class="info-row">
+                    <span class="badge aim">🎯 Aim</span>
+                    <p>Clearly defines what we are building, testing, or repairing in the lab.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge tools">🛠️ Tools</span>
+                    <p>The precise instruments, raw materials, and software required.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge safety">⚠️ Safety</span>
+                    <p>Crucial precautions to avoid hazards and protect equipment.</p>
+                </div>
+                <div class="steps-container" style="border-left-color: #3b82f6;">
+                    <h4>📝 Procedure (Steps)</h4>
+                    <p style="color: #475569;">The chronological, easy-to-follow sequence of actions to take.</p>
+                </div>
+                <div class="result-box">
+                    <span>✅</span> <strong>Result:</strong> The final verified outcome of the experiment.
+                </div>
+            </div>
+        </div>
+
+        <!-- COPA Content -->
+        <div id="copa" class="tab-content">
+            <div class="content-header">
+                <h2>COPA Practicals</h2>
+                <p>Advanced system setups, networking configurations, and coding labs.</p>
+            </div>
+            
+            <div class="practical-card">
+                <div class="practical-title">
+                    <div class="icon-box">💿</div>
+                    <h3>Experiment 1: OS Installation</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="badge aim">🎯 Aim</span>
+                    <p>To format a PC and successfully install the Windows 10 Operating System.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge tools">🛠️ Tools</span>
+                    <p>8GB+ USB Pen Drive, Desktop PC, Rufus Software, Windows 10 ISO File.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge safety">⚠️ Safety</span>
+                    <p>Always take a full backup of the C: Drive to prevent data loss before formatting.</p>
+                </div>
+                
+                <div class="steps-container">
+                    <h4>📝 Step-by-Step Procedure:</h4>
+                    <ol class="premium-step-list">
+                        <li>Connect the USB drive to the PC and open the Rufus tool.</li>
+                        <li>Select your downloaded Windows ISO file and click "Start" to make it bootable.</li>
+                        <li>Restart the target PC and continuously press the Boot Menu key (F12, F8, or ESC).</li>
+                        <li>Select the USB drive from the boot menu to launch the installer.</li>
+                        <li>Follow the Windows wizard, format the primary partition, and wait for installation to finish.</li>
+                    </ol>
+                </div>
+                
+                <div class="result-box">
+                    <span>✅</span> <strong>Result:</strong> Windows 10 is successfully installed and the system is ready to use.
+                </div>
+            </div>
+        </div>
+
+        <!-- Electrician Content -->
+        <div id="electrician" class="tab-content">
+            <div class="content-header">
+                <h2>Electrician Practicals</h2>
+                <p>Live circuit testing, machine maintenance, and industrial wiring setups.</p>
+            </div>
+            
+            <div class="practical-card">
+                <div class="practical-title">
+                    <div class="icon-box">💡</div>
+                    <h3>Experiment 1: Staircase Wiring</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="badge aim">🎯 Aim</span>
+                    <p>To control a single light bulb from two different locations using 2-way switches.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge tools">🛠️ Tools</span>
+                    <p>Two 2-way switches, Bulb, Holder, Connecting wires, Screwdriver, Wire stripper.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge safety">⚠️ Safety</span>
+                    <p>Strictly ensure the main MCB/Power supply is turned OFF before touching wires.</p>
+                </div>
+                
+                <div class="steps-container">
+                    <h4>📝 Step-by-Step Procedure:</h4>
+                    <ol class="premium-step-list">
+                        <li>Connect the top terminals of both 2-way switches together using a wire.</li>
+                        <li>Connect the bottom terminals of both 2-way switches together.</li>
+                        <li>Connect the Phase (Live) wire from the main supply to the middle terminal of Switch 1.</li>
+                        <li>Connect the middle terminal of Switch 2 to one terminal of the Bulb holder.</li>
+                        <li>Connect the Neutral wire directly to the second terminal of the Bulb holder.</li>
+                    </ol>
+                </div>
+                
+                <div class="result-box">
+                    <span>✅</span> <strong>Result:</strong> The bulb can now be independently turned ON or OFF from either switch.
+                </div>
+            </div>
+        </div>
+
+        <!-- Electronics Content -->
+        <div id="electronics" class="tab-content">
+            <div class="content-header">
+                <h2>Electronics Practicals</h2>
+                <p>Precision soldering, PCB designing, and micro-component validation.</p>
+            </div>
+            
+            <div class="practical-card">
+                <div class="practical-title">
+                    <div class="icon-box">🔥</div>
+                    <h3>Experiment 1: PCB Soldering</h3>
+                </div>
+                
+                <div class="info-row">
+                    <span class="badge aim">🎯 Aim</span>
+                    <p>To practice perfect soldering of electronic components (Resistors) onto a PCB.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge tools">🛠️ Tools</span>
+                    <p>Soldering Iron (25W), Solder Wire (60/40), Flux paste, PCB, Resistors, Wire Cutter.</p>
+                </div>
+                <div class="info-row">
+                    <span class="badge safety">⚠️ Safety</span>
+                    <p>Never touch the heated iron tip. Wear safety glasses to prevent flux splatter.</p>
+                </div>
+                
+                <div class="steps-container">
+                    <h4>📝 Step-by-Step Procedure:</h4>
+                    <ol class="premium-step-list">
+                        <li>Clean the copper tracks of the PCB and the component legs for better adhesion.</li>
+                        <li>Insert the resistor legs through the holes from the non-copper side.</li>
+                        <li>Apply a tiny amount of flux paste to the target joints.</li>
+                        <li>Touch the hot iron tip to both the pad and the component leg simultaneously for 2 seconds.</li>
+                        <li>Feed solder wire into the joint until it forms a shiny cone, then remove the iron.</li>
+                        <li>Trim the extra wire legs using a micro wire cutter.</li>
+                    </ol>
+                </div>
+                
+                <div class="result-box">
+                    <span>✅</span> <strong>Result:</strong> Components are electrically and physically secured to the PCB with no dry joints.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<a href="javascript:history.back()" class="back-btn">⬅ Back to Learning Hub</a>
+<!-- JavaScript for Premium Tab Switching -->
+<script>
+function openTab(evt, tabName) {
+    // Hide all tab content
+    var tabContent = document.getElementsByClassName("tab-content");
+    for (var i = 0; i < tabContent.length; i++) {
+        tabContent[i].classList.remove("active");
+    }
+
+    // Remove active styling from all buttons
+    var tabBtns = document.getElementsByClassName("tab-btn");
+    for (var i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove("active");
+    }
+
+    // Show the targeted tab and highlight the clicked button
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+}
+</script>
+
+</body>
+</html>

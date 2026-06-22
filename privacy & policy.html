@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Learning Hub</title>
+    <!-- FontAwesome icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Google Font - Poppins */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #0d9488; /* Teal */
+            --secondary-color: #f59e0b; /* Amber */
+            --bg-color: #f0f9ff; /* Light Blue BG */
+            --text-dark: #1f2937;
+            --text-light: #4b5563;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        /* Header Section */
+        .page-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 80px 20px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header h1 {
+            font-size: 40px;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Decorative Background Circles in Header */
+        .page-header::before {
+            content: '';
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            top: -50px;
+            left: -50px;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            bottom: -100px;
+            right: -100px;
+        }
+
+        /* Main Container Layout */
+        .container {
+            max-width: 1200px;
+            margin: -30px auto 60px;
+            padding: 0 20px;
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* Left Sidebar (Sticky Navigation) */
+        .sidebar {
+            flex: 1;
+            min-width: 280px;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 30px;
+        }
+
+        .sidebar h3 {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text-light);
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: 0.3s ease;
+        }
+
+        .sidebar ul li a i {
+            margin-right: 10px;
+            font-size: 12px;
+            color: var(--secondary-color);
+            opacity: 0;
+            transition: 0.3s ease;
+            transform: translateX(-10px);
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+
+        .sidebar ul li a:hover i {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Right Content Area */
+        .content-area {
+            flex: 3;
+            background: var(--card-bg);
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .policy-section {
+            margin-bottom: 40px;
+        }
+
+        .policy-section h2 {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .policy-section h2 i {
+            color: var(--secondary-color);
+            font-size: 20px;
+        }
+
+        .policy-section p {
+            color: var(--text-light);
+            font-size: 15.5px;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .policy-section ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+            color: var(--text-light);
+        }
+
+        .policy-section ul li {
+            margin-bottom: 8px;
+            font-size: 15.5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+            }
+            .content-area {
+                width: 100%;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="page-header">
+        <h1>Privacy Policy</h1>
+        <p>Effective Date: June 18, 2026 | Last Updated: June 2026</p>
+    </header>
+
+    <!-- Main Content Layout -->
+    <div class="container">
+        
+        <!-- Sticky Sidebar for Navigation -->
+        <aside class="sidebar">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#introduction"><i class="fas fa-chevron-right"></i> 1. Introduction</a></li>
+                <li><a href="#data-collection"><i class="fas fa-chevron-right"></i> 2. Information We Collect</a></li>
+                <li><a href="#data-use"><i class="fas fa-chevron-right"></i> 3. How We Use Your Info</a></li>
+                <li><a href="#data-security"><i class="fas fa-chevron-right"></i> 4. Data Security</a></li>
+                <li><a href="#cookies"><i class="fas fa-chevron-right"></i> 5. Cookies Policy</a></li>
+                <li><a href="#contact"><i class="fas fa-chevron-right"></i> 6. Contact Us</a></li>
+            </ul>
+        </aside>
+
+        <!-- Actual Privacy Policy Content -->
+        <main class="content-area">
+            
+            <div id="introduction" class="policy-section">
+                <h2><i class="fas fa-info-circle"></i> 1. Introduction</h2>
+                <p>Welcome to <strong>Learning Hub</strong>. We respect your privacy and are committed to protecting your personal data. This Privacy Policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.</p>
+                <p>By using our website and services, you agree to the collection and use of information in accordance with this policy.</p>
+            </div>
+
+            <div id="data-collection" class="policy-section">
+                <h2><i class="fas fa-database"></i> 2. Information We Collect</h2>
+                <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped together as follows:</p>
+                <ul>
+                    <li><strong>Identity Data:</strong> Includes first name, last name, username or similar identifier.</li>
+                    <li><strong>Contact Data:</strong> Includes email address and telephone numbers.</li>
+                    <li><strong>Technical Data:</strong> Includes internet protocol (IP) address, your login data, browser type and version, time zone setting and location.</li>
+                    <li><strong>Usage Data:</strong> Includes information about how you use our website, courses, and services.</li>
+                </ul>
+            </div>
+
+            <div id="data-use" class="policy-section">
+                <h2><i class="fas fa-tasks"></i> 3. How We Use Your Information</h2>
+                <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal data in the following circumstances:</p>
+                <ul>
+                    <li>To register you as a new student or user on our platform.</li>
+                    <li>To process and deliver your course orders or subscriptions.</li>
+                    <li>To manage our relationship with you, including notifying you about changes to our terms or privacy policy.</li>
+                    <li>To improve our website, products/services, marketing, and customer experiences.</li>
+                </ul>
+            </div>
+
+            <div id="data-security" class="policy-section">
+                <h2><i class="fas fa-shield-alt"></i> 4. Data Security</h2>
+                <p>We have put in place appropriate security measures to prevent your personal data from being accidentally lost, used, or accessed in an unauthorized way, altered, or disclosed. In addition, we limit access to your personal data to those employees, agents, contractors, and other third parties who have a business need to know.</p>
+            </div>
+
+            <div id="cookies" class="policy-section">
+                <h2><i class="fas fa-cookie-bite"></i> 5. Cookies Policy</h2>
+                <p>Our website uses cookies to distinguish you from other users of our website. This helps us to provide you with a good experience when you browse our website and also allows us to improve our site. You can set your browser to refuse all or some browser cookies, or to alert you when websites set or access cookies.</p>
+            </div>
+
+            <div id="contact" class="policy-section">
+                <h2><i class="fas fa-envelope-open-text"></i> 6. Contact Us</h2>
+                <p>If you have any questions about this Privacy Policy, including any requests to exercise your legal rights, please contact us using the details set out below:</p>
+                <ul>
+                    <li><strong>Email:</strong> privacy@learninghub.com</li>
+                    <li><strong>Phone:</strong> +91 98765 43210</li>
+                    <li><strong>Address:</strong> A-12, Knowledge Park, Sector 62, Noida, UP - 201309</li>
+                </ul>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

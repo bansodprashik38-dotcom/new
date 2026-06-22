@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COPA Mock Test Engine - Complete 10 Sets</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+        }
+        
+        .back-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .back-btn-pro {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #3498db; 
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .back-btn-pro:hover {
+            background-color: #2980b9; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: translateY(-4px); 
+        }
+
+        .back-btn-pro svg { width: 22px; height: 22px; fill: currentColor; }
+        
+        .container { max-width: 900px; margin: 40px auto 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2, h3 { color: #2c3e50; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+        .btn { padding: 12px 20px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; width: 100%; }
+        .btn:hover { background-color: #2980b9; }
+        .btn:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        .btn-success { background-color: #2ecc71; margin-top: 15px;}
+        .btn-success:hover { background-color: #27ae60; }
+        
+        #timer-bar { display: flex; justify-content: space-between; align-items: center; background: #e74c3c; color: white; padding: 15px; border-radius: 5px; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; margin-bottom: 20px;}
+        .question-card { background: #fafafa; padding: 20px; border-left: 5px solid #3498db; margin-bottom: 15px; border-radius: 4px; }
+        .question-card p { font-weight: bold; font-size: 16px; margin-top: 0; }
+        .options label { display: block; padding: 8px; cursor: pointer; background: #fff; border: 1px solid #ddd; margin-bottom: 8px; border-radius: 4px; }
+        .options label:hover { background: #f1f1f1; }
+        .options input { margin-right: 10px; }
+        
+        .result-box { text-align: center; padding: 30px; border: 2px dashed #bdc3c7; border-radius: 10px; margin-top: 20px; }
+        .pass { color: #2ecc71; font-weight: bold; font-size: 24px; }
+        .fail { color: #e74c3c; font-weight: bold; font-size: 24px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #3498db; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="dashboard">
+        <h1>COPA Mock Test Series</h1>
+        <p style="text-align: center;">Complete 10 Sets | 25 Questions Each | 30 Mins per Set | Passing: 50%</p>
+        <div class="grid" id="set-buttons"></div>
+        <br>
+        <button class="btn btn-success" onclick="showOverallResult()">View Overall Result</button>
+    </div>
+
+    <div id="test-view" style="display: none;">
+        <div id="timer-bar">
+            <span id="set-title">Set 1</span>
+            <span>Time Left: <span id="time-display">30:00</span></span>
+        </div>
+        <div id="questions-container"></div>
+        <br>
+        <button class="btn btn-success" onclick="manualSubmit()">Submit Test</button>
+    </div>
+
+    <div id="result-view" style="display: none;">
+        <h2>Test Completed</h2>
+        <div class="result-box" id="result-details"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+
+    <div id="overall-view" style="display: none;">
+        <h2>Final Overall Results</h2>
+        <div id="overall-table-container"></div>
+        <br>
+        <button class="btn" onclick="returnToDashboard()">Back to Dashboard</button>
+    </div>
+</div>
+
+<div class="back-wrapper">
+    <button onclick="smartBack()" class="back-btn-pro">
+        <svg viewBox="0 0 24 24">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+        </svg>
+        Return To Home Page
+    </button>
+</div>
+
+<script>
+    // --- COMPLETE DATABASE OF 10 SETS (25 Qs Each) ---
+    const testData = {
+        1: [ 
+            { q: "Which of the following is considered the brain of the computer?", options: ["A) RAM", "B) CPU", "C) Motherboard", "D) Hard Disk"], ans: 1 },
+            { q: "1 Byte is equal to how many bits?", options: ["A) 4 bits", "B) 8 bits", "C) 16 bits", "D) 32 bits"], ans: 1 },
+            { q: "What is the keyboard shortcut for the 'Paste' command?", options: ["A) Ctrl + C", "B) Ctrl + X", "C) Ctrl + V", "D) Ctrl + P"], ans: 2 },
+            { q: "Which network topology relies on a single central hub or switch?", options: ["A) Ring", "B) Bus", "C) Mesh", "D) Star"], ans: 3 },
+            { q: "What is the standard file extension for a Microsoft Word document?", options: ["A) .xls", "B) .ppt", "C) .docx", "D) .txt"], ans: 2 },
+            { q: "In MS Excel, every formula must begin with which symbol?", options: ["A) +", "B) @", "C) #", "D) ="], ans: 3 },
+            { q: "Which of the following is NOT an Operating System?", options: ["A) Linux", "B) Windows", "C) Oracle", "D) DOS"], ans: 2 },
+            { q: "What does WAN stand for?", options: ["A) Wide Area Network", "B) Wired Area Network", "C) Web Access Network", "D) Wide Access Node"], ans: 0 },
+            { q: "HTML stands for:", options: ["A) Hyper Text Markup Language", "B) High Text Machine Language", "C) Hyper Tool Markup Language", "D) Hyper Text Machine Language"], ans: 0 },
+            { q: "Which protocol is primarily used for sending emails?", options: ["A) FTP", "B) HTTP", "C) SMTP", "D) POP3"], ans: 2 },
+            { q: "A program that converts a high-level language into machine code in one go is called:", options: ["A) Interpreter", "B) Compiler", "C) Assembler", "D) Linker"], ans: 1 },
+            { q: "What is the base of the binary number system?", options: ["A) 2", "B) 8", "C) 10", "D) 16"], ans: 0 },
+            { q: "Which DOS command is used to display the list of files and subdirectories?", options: ["A) MD", "B) CD", "C) DIR", "D) TYPE"], ans: 2 },
+            { q: "What does CSS stand for in web development?", options: ["A) Cascading Style Sheets", "B) Creative Style System", "C) Computer Style Sheets", "D) Colorful Style Sheets"], ans: 0 },
+            { q: "In JavaScript, how do you display an alert box with the message 'Hello World'?", options: ["A) msg('Hello World');", "B) alert('Hello World');", "C) prompt('Hello World');", "D) console.log('Hello World');"], ans: 1 },
+            { q: "Which SQL command is used to retrieve data from a database?", options: ["A) GET", "B) OPEN", "C) EXTRACT", "D) SELECT"], ans: 3 },
+            { q: "What is the default port number for HTTP?", options: ["A) 21", "B) 25", "C) 80", "D) 443"], ans: 2 },
+            { q: "What is the smallest unit of data in a computer?", options: ["A) Byte", "B) Nibble", "C) Bit", "D) Record"], ans: 2 },
+            { q: "A network that covers a geographic area like a city is known as:", options: ["A) LAN", "B) MAN", "C) WAN", "D) PAN"], ans: 1 },
+            { q: "What is the file extension for a Microsoft Excel template?", options: ["A) .xlsx", "B) .xlsm", "C) .xltx", "D) .xlsb"], ans: 2 },
+            { q: "Which HTML tag is used to create a hyperlink?", options: ["A) &lt;link&gt;", "B) &lt;a&gt;", "C) &lt;href&gt;", "D) &lt;hyperlink&gt;"], ans: 1 },
+            { q: "What does GUI stand for?", options: ["A) General User Interface", "B) Graphical User Interface", "C) Global User Interface", "D) Graphical Utility Interface"], ans: 1 },
+            { q: "Which device is used to connect two different types of networks?", options: ["A) Hub", "B) Switch", "C) Router", "D) Repeater"], ans: 2 },
+            { q: "In VBA (Visual Basic for Applications), which keyword declares a variable?", options: ["A) Var", "B) Let", "C) Set", "D) Dim"], ans: 3 },
+            { q: "What is the primary purpose of a computer firewall?", options: ["A) To prevent physical fires", "B) Security and filtering traffic", "C) To speed up the internet", "D) To store backup data"], ans: 1 }
+        ],
+        
+        2: [ 
+            { q: "What is the shortcut key to undo the last action in a document?", options: ["A) Ctrl + X", "B) Ctrl + Z", "C) Ctrl + Y", "D) Ctrl + U"], ans: 1 },
+            { q: "Which of the following is a non-volatile memory?", options: ["A) RAM", "B) ROM", "C) Cache", "D) Register"], ans: 1 },
+            { q: "What does LAN stand for?", options: ["A) Local Area Network", "B) Large Area Network", "C) Logical Area Network", "D) Local Access Network"], ans: 0 },
+            { q: "In MS Excel, a collection of worksheets is called a:", options: ["A) Workbook", "B) Document", "C) Spreadsheet", "D) File"], ans: 0 },
+            { q: "Which device is used to input physical documents into the computer?", options: ["A) Printer", "B) Monitor", "C) Scanner", "D) Projector"], ans: 2 },
+            { q: "HTTP stands for:", options: ["A) Hyper Text Transfer Protocol", "B) High Text Transmission Protocol", "C) Hyper Text Transmission Protocol", "D) Hyper Tool Transfer Protocol"], ans: 0 },
+            { q: "Which of the following is an output device?", options: ["A) Keyboard", "B) Mouse", "C) Microphone", "D) Speaker"], ans: 3 },
+            { q: "To save an existing document with a new name, which command is used?", options: ["A) Save", "B) Save As", "C) Copy", "D) Rename"], ans: 1 },
+            { q: "In HTML, which tag is used for the largest heading?", options: ["A) &lt;head&gt;", "B) &lt;h6&gt;", "C) &lt;h1&gt;", "D) &lt;header&gt;"], ans: 2 },
+            { q: "Which network topology connects all devices to a single central cable?", options: ["A) Star", "B) Ring", "C) Bus", "D) Mesh"], ans: 2 },
+            { q: "What does URL stand for?", options: ["A) Uniform Resource Locator", "B) Universal Resource Locator", "C) Uniform Resource Link", "D) Universal Routing Link"], ans: 0 },
+            { q: "What is the main function of the ALU?", options: ["A) Store data", "B) Perform mathematical operations", "C) Control input", "D) Manage memory"], ans: 1 },
+            { q: "Which of the following is a valid IP address format?", options: ["A) 192.168.1.1", "B) 999.999.999.999", "C) 256.1.2.3", "D) ab.cd.ef.gh"], ans: 0 },
+            { q: "The process of starting or restarting a computer is called:", options: ["A) Loading", "B) Booting", "C) Formatting", "D) Executing"], ans: 1 },
+            { q: "In a database, a row is also known as a:", options: ["A) Field", "B) Record", "C) Column", "D) Table"], ans: 1 },
+            { q: "Which malware is designed to spread from one computer to another?", options: ["A) Spyware", "B) Adware", "C) Virus", "D) Trojan"], ans: 2 },
+            { q: "Which function key is typically used to refresh a webpage?", options: ["A) F2", "B) F4", "C) F5", "D) F12"], ans: 2 },
+            { q: "In Linux, which command is used to list directory contents?", options: ["A) dir", "B) ls", "C) list", "D) show"], ans: 1 },
+            { q: "The extension '.pdf' stands for:", options: ["A) Portable Document Format", "B) Printed Document File", "C) Public Data Format", "D) Published Document Format"], ans: 0 },
+            { q: "Which application is primarily used for creating presentations?", options: ["A) MS Word", "B) MS Excel", "C) MS Access", "D) MS PowerPoint"], ans: 3 },
+            { q: "Which of these is a Web Browser?", options: ["A) Google", "B) Yahoo", "C) Google Chrome", "D) Bing"], ans: 2 },
+            { q: "What is the shortcut to select all text in a document?", options: ["A) Ctrl + A", "B) Ctrl + S", "C) Ctrl + C", "D) Ctrl + V"], ans: 0 },
+            { q: "In JavaScript, which symbol is used for single-line comments?", options: ["A) /*", "B) //", "C) &lt;!--", "D) #"], ans: 1 },
+            { q: "Which device regulates power and provides battery backup?", options: ["A) SMPS", "B) UPS", "C) Inverter", "D) Adapter"], ans: 1 },
+            { q: "SQL stands for:", options: ["A) Standard Query Language", "B) Structured Query Language", "C) Simple Question Language", "D) Sequential Query Language"], ans: 1 }
+        ],
+
+        3: [ 
+            { q: "In Excel, which function is used to find the highest number in a range?", options: ["A) HIGH()", "B) TOP()", "C) MAX()", "D) LARGE()"], ans: 2 },
+            { q: "What is the shortcut to insert a new worksheet in Excel?", options: ["A) Shift + F11", "B) Ctrl + W", "C) Alt + N", "D) Ctrl + N"], ans: 0 },
+            { q: "Which tool in Word allows you to send the same letter to multiple people?", options: ["A) Macro", "B) Mail Merge", "C) Hyperlink", "D) Template"], ans: 1 },
+            { q: "In Excel, VLOOKUP stands for:", options: ["A) Variable Lookup", "B) Value Lookup", "C) Vertical Lookup", "D) Visual Lookup"], ans: 2 },
+            { q: "What is the maximum number of rows in MS Excel 2016?", options: ["A) 65,536", "B) 1,048,576", "C) 16,384", "D) 256"], ans: 1 },
+            { q: "By default, how many sheets are in a new Excel 2016 workbook?", options: ["A) 1", "B) 3", "C) 5", "D) 0"], ans: 0 },
+            { q: "Which chart is best for showing proportions of a whole?", options: ["A) Line Chart", "B) Bar Chart", "C) Pie Chart", "D) Scatter Plot"], ans: 2 },
+            { q: "To select an entire column in Excel, press:", options: ["A) Ctrl + Spacebar", "B) Shift + Spacebar", "C) Ctrl + C", "D) Alt + Spacebar"], ans: 0 },
+            { q: "What does the COUNT() function do in Excel?", options: ["A) Counts all non-empty cells", "B) Counts cells with text", "C) Counts cells with numbers", "D) Counts formulas"], ans: 2 },
+            { q: "In MS Word, 'Drop Cap' is used to:", options: ["A) Drop all caps", "B) Make first letter large", "C) Add a shadow", "D) Lower the text"], ans: 1 },
+            { q: "Which feature is used to copy the formatting of one text to another?", options: ["A) Copy Paste", "B) Format Painter", "C) Style Copier", "D) Font Painter"], ans: 1 },
+            { q: "What is the extension of an Excel macro-enabled workbook?", options: ["A) .xlsx", "B) .xls", "C) .xlsm", "D) .xlt"], ans: 2 },
+            { q: "In Word, what is the default alignment for a paragraph?", options: ["A) Right alignment", "B) Center alignment", "C) Left alignment", "D) Justify"], ans: 2 },
+            { q: "The intersection of a row and a column in Excel is called:", options: ["A) Square", "B) Cubicle", "C) Cell", "D) Box"], ans: 2 },
+            { q: "Which function key is used to edit the contents of a cell in Excel?", options: ["A) F1", "B) F2", "C) F3", "D) F4"], ans: 1 },
+            { q: "In Word, Ctrl + E is the shortcut for:", options: ["A) Align Left", "B) Align Right", "C) Center Align", "D) Justify"], ans: 2 },
+            { q: "Which symbol specifies an absolute reference in Excel?", options: ["A) #", "B) @", "C) %", "D) $"], ans: 3 },
+            { q: "What is the shortcut to print a document?", options: ["A) Ctrl + P", "B) Alt + P", "C) Shift + P", "D) Ctrl + PrtScrn"], ans: 0 },
+            { q: "In Excel, text data is by default aligned to the:", options: ["A) Left", "B) Right", "C) Center", "D) Top"], ans: 0 },
+            { q: "In Excel, numerical data is by default aligned to the:", options: ["A) Left", "B) Right", "C) Center", "D) Bottom"], ans: 1 },
+            { q: "What is the zoom limit in MS Word?", options: ["A) 100%", "B) 200%", "C) 400%", "D) 500%"], ans: 3 },
+            { q: "Which tab contains the 'Spelling and Grammar' option in Word?", options: ["A) Home", "B) Insert", "C) Review", "D) View"], ans: 2 },
+            { q: "What is the shortcut to find text in a document?", options: ["A) Ctrl + F", "B) Ctrl + S", "C) Ctrl + H", "D) Ctrl + G"], ans: 0 },
+            { q: "In Excel, a formula begins with which character?", options: ["A) @", "B) #", "C) = ", "D) +"], ans: 2 },
+            { q: "Which function adds all the numbers in a range of cells?", options: ["A) ADD()", "B) PLUS()", "C) SUM()", "D) TOTAL()"], ans: 2 }
+        ],
+
+        4: [ 
+            { q: "Which key is used to start a slide show from the beginning in PowerPoint?", options: ["A) F2", "B) F5", "C) F7", "D) Shift + F5"], ans: 1 },
+            { q: "In MS Access, which field uniquely identifies a record?", options: ["A) Foreign Key", "B) Primary Key", "C) Unique Key", "D) Main Key"], ans: 1 },
+            { q: "What is a single page of a presentation called?", options: ["A) Slide", "B) Page", "C) Document", "D) Sheet"], ans: 0 },
+            { q: "Which view in PowerPoint is used to sort and rearrange slides?", options: ["A) Normal View", "B) Notes Page", "C) Slide Sorter View", "D) Reading View"], ans: 2 },
+            { q: "In a database, what is a query?", options: ["A) A report", "B) A table", "C) A request for data", "D) A form"], ans: 2 },
+            { q: "Which is a valid data type in MS Access?", options: ["A) Number", "B) Short Text", "C) Yes/No", "D) All of the above"], ans: 3 },
+            { q: "What is the extension of an Access Database file?", options: ["A) .accdb", "B) .mdb", "C) Both A and B", "D) .dbx"], ans: 2 },
+            { q: "Which shortcut inserts a New Slide in PowerPoint?", options: ["A) Ctrl + N", "B) Ctrl + S", "C) Ctrl + M", "D) Ctrl + I"], ans: 2 },
+            { q: "RDBMS stands for:", options: ["A) Relational Database Management System", "B) Real Data Base Management System", "C) Regional Database Management System", "D) Relative Database"], ans: 0 },
+            { q: "Motion effects applied to text or images in a slide are called:", options: ["A) Transitions", "B) Animations", "C) Designs", "D) Layouts"], ans: 1 },
+            { q: "Which database object is used to collect data directly from users?", options: ["A) Table", "B) Query", "C) Form", "D) Report"], ans: 2 },
+            { q: "What is the default orientation of a PowerPoint slide?", options: ["A) Portrait", "B) Landscape", "C) Vertical", "D) Square"], ans: 1 },
+            { q: "Which feature allows you to create a simple presentation quickly?", options: ["A) AutoContent Wizard", "B) Animations", "C) Chart Wizard", "D) Transition Wizard"], ans: 0 },
+            { q: "In MS Access, a collection of related fields is called:", options: ["A) Database", "B) Table", "C) Record", "D) Query"], ans: 2 },
+            { q: "Which key is used to exit a slide show in PowerPoint?", options: ["A) Enter", "B) Shift", "C) Alt", "D) Esc"], ans: 3 },
+            { q: "What is the max length of 'Short Text' data type in Access?", options: ["A) 255 characters", "B) 100 characters", "C) 65000 characters", "D) Infinite"], ans: 0 },
+            { q: "Which tab is used to add a video to a PowerPoint slide?", options: ["A) Design", "B) Animations", "C) Insert", "D) Review"], ans: 2 },
+            { q: "What is the shortcut to duplicate a slide in PowerPoint?", options: ["A) Ctrl + D", "B) Ctrl + M", "C) Ctrl + C", "D) Ctrl + X"], ans: 0 },
+            { q: "A foreign key in a database table is used to:", options: ["A) Prevent duplicate records", "B) Link to a primary key in another table", "C) Delete records", "D) Sort data"], ans: 1 },
+            { q: "Which PowerPoint view shows a miniature of all slides?", options: ["A) Outline view", "B) Slide Sorter view", "C) Normal view", "D) Master view"], ans: 1 },
+            { q: "What is 'Normalization' in a database?", options: ["A) Organizing data to reduce redundancy", "B) Increasing data size", "C) Changing data types", "D) Deleting old data"], ans: 0 },
+            { q: "To add a new row at the end of an Access table, you click on:", options: ["A) New Record", "B) Asterisk (*) row", "C) Bottom row", "D) Last cell"], ans: 1 },
+            { q: "Which object prints database information in an organized way?", options: ["A) Form", "B) Table", "C) Query", "D) Report"], ans: 3 },
+            { q: "What does SQL stand for in databases?", options: ["A) Standard Query Language", "B) Structured Query Language", "C) System Query Logic", "D) Source Query Language"], ans: 1 },
+            { q: "Which format is used to save a presentation as a video?", options: ["A) .mp4", "B) .pptx", "C) .pdf", "D) .docx"], ans: 0 }
+        ],
+
+        5: [ 
+            { q: "Which HTML tag is used to create a numbered list?", options: ["A) &lt;ul&gt;", "B) &lt;li&gt;", "C) &lt;ol&gt;", "D) &lt;dl&gt;"], ans: 2 },
+            { q: "What is the correct HTML tag for a line break?", options: ["A) &lt;br&gt;", "B) &lt;lb&gt;", "C) &lt;break&gt;", "D) &lt;hr&gt;"], ans: 0 },
+            { q: "Which protocol is used for securely transmitting data over the web?", options: ["A) HTTP", "B) FTP", "C) HTTPS", "D) SMTP"], ans: 2 },
+            { q: "BCC in an email stands for:", options: ["A) Blind Carbon Copy", "B) Basic Carbon Copy", "C) Bold Carbon Copy", "D) Blue Carbon Copy"], ans: 0 },
+            { q: "Who invented the World Wide Web?", options: ["A) Bill Gates", "B) Tim Berners-Lee", "C) Steve Jobs", "D) Charles Babbage"], ans: 1 },
+            { q: "Which HTML attribute specifies an alternate text for an image?", options: ["A) title", "B) src", "C) alt", "D) href"], ans: 2 },
+            { q: "A piece of code that secretly attaches to other files to cause damage is called:", options: ["A) Trojan", "B) Worm", "C) Virus", "D) Spam"], ans: 2 },
+            { q: "Which tag is used to create a table row in HTML?", options: ["A) &lt;td&gt;", "B) &lt;th&gt;", "C) &lt;tr&gt;", "D) &lt;table&gt;"], ans: 2 },
+            { q: "What does an ISP do?", options: ["A) Protects from viruses", "B) Provides Internet connection", "C) Creates websites", "D) Repairs computers"], ans: 1 },
+            { q: "Which of the following is a search engine?", options: ["A) Firefox", "B) Chrome", "C) Safari", "D) Google"], ans: 3 },
+            { q: "In HTML, &lt;b&gt; tag is used to:", options: ["A) Break line", "B) Make text bold", "C) Bullet list", "D) Background color"], ans: 1 },
+            { q: "What does HTTP stand for?", options: ["A) Hyper Text Transfer Protocol", "B) High Text Transfer Protocol", "C) Hyper Transfer Text Protocol", "D) Hyper Text Transmission Protocol"], ans: 0 },
+            { q: "Which CSS property changes background color?", options: ["A) bg-color", "B) background-color", "C) color", "D) body-bg"], ans: 1 },
+            { q: "What is a 'Domain Name'?", options: ["A) A computer's IP address", "B) A website's human-readable name", "C) An email ID", "D) A server type"], ans: 1 },
+            { q: "Which HTML tag is used for the largest heading?", options: ["A) &lt;heading&gt;", "B) &lt;h6&gt;", "C) &lt;head&gt;", "D) &lt;h1&gt;"], ans: 3 },
+            { q: "What does WWW stand for?", options: ["A) World Web Wide", "B) World Wide Web", "C) Wide World Web", "D) Web World Wide"], ans: 1 },
+            { q: "FTP stands for:", options: ["A) File Transfer Protocol", "B) Folder Transfer Protocol", "C) File Transmission Protocol", "D) Fast Transfer Protocol"], ans: 0 },
+            { q: "A web browser is a type of:", options: ["A) System Software", "B) Application Software", "C) Hardware", "D) Network"], ans: 1 },
+            { q: "Which HTML tag creates a drop-down list?", options: ["A) &lt;list&gt;", "B) &lt;input&gt;", "C) &lt;select&gt;", "D) &lt;dropdown&gt;"], ans: 2 },
+            { q: "IPv4 addresses consist of how many bits?", options: ["A) 16", "B) 32", "C) 64", "D) 128"], ans: 1 },
+            { q: "What is an IP address used for?", options: ["A) To identify a device on a network", "B) To block viruses", "C) To create web pages", "D) To increase internet speed"], ans: 0 },
+            { q: "Which email folder stores unsent drafts?", options: ["A) Inbox", "B) Sent", "C) Spam", "D) Drafts"], ans: 3 },
+            { q: "Which port is used for HTTPS?", options: ["A) 80", "B) 21", "C) 443", "D) 25"], ans: 2 },
+            { q: "In CSS, how do you select an element with id 'demo'?", options: ["A) .demo", "B) #demo", "C) *demo", "D) @demo"], ans: 1 },
+            { q: "Which HTML tag inserts an image?", options: ["A) &lt;img&gt;", "B) &lt;image&gt;", "C) &lt;pic&gt;", "D) &lt;picture&gt;"], ans: 0 }
+        ],
+
+        6: [ 
+            { q: "Which CSS property is used to change the text color?", options: ["A) text-color", "B) color", "C) font-color", "D) fgcolor"], ans: 1 },
+            { q: "Inside which HTML element do we put JavaScript?", options: ["A) &lt;javascript&gt;", "B) &lt;script&gt;", "C) &lt;js&gt;", "D) &lt;code&gt;"], ans: 1 },
+            { q: "How do you write 'IF' in a JavaScript statement?", options: ["A) if i = 5 then", "B) if (i == 5)", "C) if i = 5", "D) if i == 5 then"], ans: 1 },
+            { q: "Which HTML tag is used to define an internal style sheet?", options: ["A) &lt;style&gt;", "B) &lt;css&gt;", "C) &lt;script&gt;", "D) &lt;design&gt;"], ans: 0 },
+            { q: "How do you create a function in JavaScript?", options: ["A) function = myFunction()", "B) function:myFunction()", "C) function myFunction()", "D) create myFunction()"], ans: 2 },
+            { q: "Which CSS property controls the text size?", options: ["A) text-style", "B) font-size", "C) text-size", "D) font-weight"], ans: 1 },
+            { q: "How can you add a comment in CSS?", options: ["A) // comment //", "B) /* comment */", "C) &lt;!-- comment --&gt;", "D) ' comment"], ans: 1 },
+            { q: "JavaScript is a _____ language.", options: ["A) Object-Oriented", "B) Object-Based", "C) Assembly", "D) Hardware"], ans: 1 },
+            { q: "Which symbol is used to select a class in CSS?", options: ["A) .", "B) #", "C) *", "D) @"], ans: 0 },
+            { q: "What is the correct syntax for referring to an external script called 'app.js'?", options: ["A) &lt;script src='app.js'&gt;", "B) &lt;script href='app.js'&gt;", "C) &lt;script ref='app.js'&gt;", "D) &lt;script name='app.js'&gt;"], ans: 0 },
+            { q: "Which JS method is used to write text into an HTML document?", options: ["A) document.write()", "B) document.print()", "C) window.print()", "D) console.log()"], ans: 0 },
+            { q: "How do you declare a variable in JavaScript?", options: ["A) var carName;", "B) variable carName;", "C) v carName;", "D) str carName;"], ans: 0 },
+            { q: "Which JS operator is used to assign a value?", options: ["A) *", "B) -", "C) =", "D) =="], ans: 2 },
+            { q: "What is DOM in HTML/JS?", options: ["A) Document Object Model", "B) Data Object Model", "C) Document Oriented Model", "D) Digital Object Mode"], ans: 0 },
+            { q: "In CSS, what does 'margin' do?", options: ["A) Adds space inside border", "B) Adds space outside border", "C) Changes text color", "D) Hides element"], ans: 1 },
+            { q: "What is the correct way to add a multi-line comment in JS?", options: ["A) &lt;!-- comment --&gt;", "B) /* comment */", "C) // comment //", "D) ** comment **"], ans: 1 },
+            { q: "Which JS function parses a string and returns an integer?", options: ["A) parseFloat()", "B) parseInt()", "C) toInt()", "D) Number()"], ans: 1 },
+            { q: "Which HTML attribute attaches a CSS class?", options: ["A) id", "B) class", "C) style", "D) css"], ans: 1 },
+            { q: "How do you call a function named 'myFunction'?", options: ["A) call myFunction()", "B) myFunction()", "C) run.myFunction()", "D) execute myFunction()"], ans: 1 },
+            { q: "Which CSS property makes text bold?", options: ["A) font-weight: bold;", "B) text-style: bold;", "C) font: bold;", "D) style: bold;"], ans: 0 },
+            { q: "What will `typeof 'Hello'` return in JavaScript?", options: ["A) object", "B) string", "C) undefined", "D) text"], ans: 1 },
+            { q: "In CSS, what does the 'z-index' property control?", options: ["A) Opacity", "B) Stacking order of elements", "C) Element width", "D) Font size"], ans: 1 },
+            { q: "Which JavaScript event occurs when a user clicks an HTML element?", options: ["A) onchange", "B) onmouseover", "C) onmouseclick", "D) onclick"], ans: 3 },
+            { q: "CSS stands for:", options: ["A) Computer Style Sheets", "B) Creative Style Sheets", "C) Cascading Style Sheets", "D) Colorful Style Sheets"], ans: 2 },
+            { q: "Which JS keyword is used to declare a constant?", options: ["A) var", "B) let", "C) const", "D) constant"], ans: 2 }
+        ],
+
+        7: [ 
+            { q: "In Tally, which shortcut is used to select a Company?", options: ["A) F1", "B) Alt + F1", "C) F2", "D) F3"], ans: 0 },
+            { q: "Which voucher type is used for cash deposit into a bank?", options: ["A) Receipt", "B) Payment", "C) Contra", "D) Journal"], ans: 2 },
+            { q: "What is the shortcut for Receipt Voucher in Tally?", options: ["A) F4", "B) F5", "C) F6", "D) F7"], ans: 2 },
+            { q: "A summary of all ledger balances is known as:", options: ["A) Balance Sheet", "B) Trial Balance", "C) P&L Account", "D) Cash Flow"], ans: 1 },
+            { q: "In Tally, 'Alt + P' is used for:", options: ["A) Pasting", "B) Printing", "C) Profit", "D) Payroll"], ans: 1 },
+            { q: "Suspense Account group is created under which primary group?", options: ["A) Liabilities", "B) Assets", "C) Income", "D) None of the above"], ans: 0 },
+            { q: "Which shortcut key is used for the Payment voucher?", options: ["A) F4", "B) F5", "C) F6", "D) F8"], ans: 1 },
+            { q: "GST stands for:", options: ["A) Goods and Service Tax", "B) Great Service Tax", "C) General Sales Tax", "D) Gross Service Tax"], ans: 0 },
+            { q: "In accounting, what does 'Dr' stand for?", options: ["A) Drive", "B) Draft", "C) Debit", "D) Draw"], ans: 2 },
+            { q: "Which shortcut changes the current date in Tally?", options: ["A) F1", "B) F2", "C) Alt + F2", "D) F3"], ans: 1 },
+            { q: "Which voucher is used for credit purchases?", options: ["A) Payment", "B) Journal", "C) Purchase", "D) Receipt"], ans: 2 },
+            { q: "F11 in Tally opens which menu?", options: ["A) Company Features", "B) Configuration", "C) Vouchers", "D) Ledgers"], ans: 0 },
+            { q: "Which account is credited when cash is withdrawn for personal use?", options: ["A) Cash A/c", "B) Bank A/c", "C) Drawings A/c", "D) Capital A/c"], ans: 0 },
+            { q: "What is the default group for Bank Accounts in Tally?", options: ["A) Cash-in-hand", "B) Bank Accounts", "C) Secured Loans", "D) Sundry Debtors"], ans: 1 },
+            { q: "The shortcut to open Sales Voucher is:", options: ["A) F6", "B) F7", "C) F8", "D) F9"], ans: 2 },
+            { q: "TDS stands for:", options: ["A) Tax Deducted at Source", "B) Tax Derived at Source", "C) Total Direct Sales", "D) Tax Direct System"], ans: 0 },
+            { q: "Ledger creation is found under which menu?", options: ["A) Accounting Vouchers", "B) Accounts Info", "C) Inventory Info", "D) Display"], ans: 1 },
+            { q: "Which shortcut key is used to duplicate a voucher in Tally?", options: ["A) Ctrl + D", "B) Alt + 2", "C) Ctrl + 2", "D) Alt + D"], ans: 1 },
+            { q: "A person to whom money is owed for goods bought is a:", options: ["A) Debtor", "B) Creditor", "C) Owner", "D) Buyer"], ans: 1 },
+            { q: "What does 'Cr' stand for in accounting?", options: ["A) Cross", "B) Create", "C) Credit", "D) Current"], ans: 2 },
+            { q: "Which report shows the financial position of a business on a specific date?", options: ["A) Profit & Loss A/c", "B) Trial Balance", "C) Balance Sheet", "D) Daybook"], ans: 2 },
+            { q: "To exit Tally, which shortcut can be used from Gateway of Tally?", options: ["A) Ctrl + Q", "B) Alt + E", "C) Ctrl + M", "D) Alt + X"], ans: 0 },
+            { q: "Journal voucher shortcut is:", options: ["A) F4", "B) F7", "C) F8", "D) F9"], ans: 1 },
+            { q: "Inventory features can be accessed by pressing:", options: ["A) F11 -> F1", "B) F11 -> F2", "C) F11 -> F3", "D) F12"], ans: 1 },
+            { q: "The left side of an accounting ledger is called:", options: ["A) Credit side", "B) Asset side", "C) Debit side", "D) Liability side"], ans: 2 }
+        ],
+
+        8: [ 
+            { q: "Which command in Linux is used to display the current working directory?", options: ["A) pwd", "B) cd", "C) dir", "D) root"], ans: 0 },
+            { q: "Which Linux command is used to change file permissions?", options: ["A) chown", "B) chmod", "C) chgrp", "D) passwd"], ans: 1 },
+            { q: "Who is the creator of the Linux kernel?", options: ["A) Bill Gates", "B) Linus Torvalds", "C) Ken Thompson", "D) Dennis Ritchie"], ans: 1 },
+            { q: "What is 'Phishing'?", options: ["A) A networking protocol", "B) A type of fishing game", "C) Fraudulent attempt to obtain sensitive info", "D) A Linux command"], ans: 2 },
+            { q: "A strong password should contain:", options: ["A) Only alphabets", "B) Only numbers", "C) Mixed characters (Alpha, Num, Symbols)", "D) Name of the user"], ans: 2 },
+            { q: "Which act in India deals with Cyber Crime?", options: ["A) IT Act 2000", "B) Indian Penal Code", "C) Copyright Act", "D) Cyber Act 2010"], ans: 0 },
+            { q: "The 'mkdir' command in Linux is used to:", options: ["A) Make a file", "B) Make a directory", "C) Move a directory", "D) Remove a directory"], ans: 1 },
+            { q: "Which of the following is an antivirus software?", options: ["A) Norton", "B) Ubuntu", "C) Apache", "D) Wireshark"], ans: 0 },
+            { q: "What does a Firewall do?", options: ["A) Burns viruses", "B) Monitors network traffic", "C) Backs up data", "D) Increases internet speed"], ans: 1 },
+            { q: "In Linux, which user has the highest privileges?", options: ["A) admin", "B) superuser", "C) root", "D) master"], ans: 2 },
+            { q: "Which command is used to copy a file in Linux?", options: ["A) move", "B) cp", "C) copy", "D) mv"], ans: 1 },
+            { q: "What is ransomware?", options: ["A) Software that speeds up PC", "B) Malware that encrypts data and demands payment", "C) An antivirus", "D) A Linux distro"], ans: 1 },
+            { q: "Which Linux command displays the contents of a file?", options: ["A) cat", "B) show", "C) view", "D) read"], ans: 0 },
+            { q: "What does 'HTTPS' provide that 'HTTP' does not?", options: ["A) Speed", "B) Security/Encryption", "C) Better graphics", "D) More storage"], ans: 1 },
+            { q: "Which symbol represents the root directory in Linux?", options: ["A) \\", "B) /", "C) ~", "D) ."], ans: 1 },
+            { q: "What is a 'Botnet'?", options: ["A) A robot network", "B) Network of infected computers controlled by hackers", "C) A secure VPN", "D) Search engine bots"], ans: 1 },
+            { q: "Which Linux command deletes a file?", options: ["A) del", "B) remove", "C) rm", "D) erase"], ans: 2 },
+            { q: "What is 'Social Engineering' in cyber security?", options: ["A) Building safe networks", "B) Manipulating people into giving confidential info", "C) Coding secure software", "D) Hardware repair"], ans: 1 },
+            { q: "The 'mv' command in Linux is used for:", options: ["A) Moving/Renaming files", "B) Making variables", "C) Moving viruses", "D) Mounting volumes"], ans: 0 },
+            { q: "A 'White Hat Hacker' is a:", options: ["A) Cyber criminal", "B) Ethical hacker who tests security", "C) Virus creator", "D) Phishing scammer"], ans: 1 },
+            { q: "Which Linux command clears the terminal screen?", options: ["A) cls", "B) clean", "C) clear", "D) wipe"], ans: 2 },
+            { q: "What is a VPN used for?", options: ["A) Increasing processor speed", "B) Creating a secure, encrypted connection over internet", "C) Editing videos", "D) Blocking pop-ups"], ans: 1 },
+            { q: "Which command shows running processes in Linux?", options: ["A) task", "B) processes", "C) top", "D) run"], ans: 2 },
+            { q: "What does Two-Factor Authentication (2FA) do?", options: ["A) Requires two passwords", "B) Adds an extra layer of security (e.g., OTP)", "C) Doubles internet speed", "D) Allows two users on one PC"], ans: 1 },
+            { q: "Linux is a _____ operating system.", options: ["A) Proprietary", "B) Closed-source", "C) Open-source", "D) Expensive"], ans: 2 }
+        ],
+
+        9: [ 
+            { q: "How many layers are there in the OSI model?", options: ["A) 4", "B) 5", "C) 7", "D) 9"], ans: 2 },
+            { q: "MAC address is also known as:", options: ["A) IP Address", "B) Logical Address", "C) Physical Address", "D) Network Address"], ans: 2 },
+            { q: "Which cable is commonly used for LAN networks?", options: ["A) Fiber Optic", "B) Twisted Pair (Ethernet)", "C) Coaxial", "D) USB"], ans: 1 },
+            { q: "SMPS stands for:", options: ["A) Simple Mode Power Supply", "B) Switched Mode Power Supply", "C) Smart Mode Power Supply", "D) Synchronous Mode Power Supply"], ans: 1 },
+            { q: "Which component holds the BIOS?", options: ["A) RAM", "B) Hard Disk", "C) ROM", "D) CPU"], ans: 2 },
+            { q: "A Router operates at which layer of the OSI model?", options: ["A) Physical", "B) Data Link", "C) Network", "D) Transport"], ans: 2 },
+            { q: "What is the speed of standard Fast Ethernet?", options: ["A) 10 Mbps", "B) 100 Mbps", "C) 1 Gbps", "D) 10 Gbps"], ans: 1 },
+            { q: "Which of the following is NOT a network protocol?", options: ["A) TCP/IP", "B) FTP", "C) HTML", "D) UDP"], ans: 2 },
+            { q: "Bluetooth is an example of:", options: ["A) PAN", "B) LAN", "C) MAN", "D) WAN"], ans: 0 },
+            { q: "The term 'Duplex' in networking means:", options: ["A) One-way communication", "B) Two-way communication", "C) No communication", "D) Error checking"], ans: 1 },
+            { q: "Which device is used to amplify or regenerate a network signal?", options: ["A) Hub", "B) Switch", "C) Repeater", "D) Modem"], ans: 2 },
+            { q: "What does 'Ping' command do?", options: ["A) Downloads files", "B) Checks connectivity with another IP", "C) Formats hard drive", "D) Installs drivers"], ans: 1 },
+            { q: "RJ-45 connector is used with which cable?", options: ["A) Coaxial", "B) Fiber Optic", "C) Twisted Pair", "D) Power cable"], ans: 2 },
+            { q: "What is the function of a Modem?", options: ["A) Modulation and Demodulation", "B) Memory management", "C) Printing documents", "D) Cooling CPU"], ans: 0 },
+            { q: "Which layer of OSI model ensures error-free data transfer?", options: ["A) Physical", "B) Data Link", "C) Application", "D) Session"], ans: 1 },
+            { q: "A device that filters network traffic based on MAC addresses is:", options: ["A) Hub", "B) Repeater", "C) Switch", "D) Modem"], ans: 2 },
+            { q: "DNS stands for:", options: ["A) Data Name System", "B) Domain Name System", "C) Dynamic Network System", "D) Digital Node System"], ans: 1 },
+            { q: "Which topology requires a terminator at both ends?", options: ["A) Star", "B) Bus", "C) Ring", "D) Mesh"], ans: 1 },
+            { q: "A 'Node' in a computer network is:", options: ["A) A cable", "B) A piece of software", "C) Any device connected to the network", "D) The internet provider"], ans: 2 },
+            { q: "Fiber optic cables transmit data in the form of:", options: ["A) Electrical pulses", "B) Radio waves", "C) Light pulses", "D) Microwaves"], ans: 2 },
+            { q: "Which IP class is used for large networks?", options: ["A) Class A", "B) Class B", "C) Class C", "D) Class D"], ans: 0 },
+            { q: "DHCP is used to:", options: ["A) Send emails", "B) Automatically assign IP addresses", "C) Browse web", "D) Encrypt data"], ans: 1 },
+            { q: "Which layer is closest to the user in OSI model?", options: ["A) Physical Layer", "B) Network Layer", "C) Transport Layer", "D) Application Layer"], ans: 3 },
+            { q: "What does WPA2 secure?", options: ["A) Wired LANs", "B) Wireless Networks (Wi-Fi)", "C) Bluetooth", "D) Fiber optics"], ans: 1 },
+            { q: "A 32-bit IP address is known as:", options: ["A) IPv4", "B) IPv6", "C) MAC", "D) DNS"], ans: 0 }
+        ],
+
+        10: [ 
+            { q: "Which memory is the fastest in a computer?", options: ["A) RAM", "B) Cache", "C) Hard Drive", "D) Flash Drive"], ans: 1 },
+            { q: "VBA stands for:", options: ["A) Visual Basic for Applications", "B) Very Basic Applications", "C) Visual Basic Array", "D) Visual Block Application"], ans: 0 },
+            { q: "Which HTML tag makes text bold?", options: ["A) &lt;bold&gt;", "B) &lt;text-bold&gt;", "C) &lt;b&gt;", "D) &lt;i&gt;"], ans: 2 },
+            { q: "In Excel, which symbol is used for Absolute Cell Referencing?", options: ["A) &", "B) @", "C) $", "D) #"], ans: 2 },
+            { q: "Which Linux command is used to remove a file?", options: ["A) remove", "B) del", "C) rm", "D) erase"], ans: 2 },
+            { q: "What is E-Commerce?", options: ["A) Electronic Communication", "B) Buying and selling goods over internet", "C) Electrical Commerce", "D) Engineering Commerce"], ans: 1 },
+            { q: "Which gateway acts as a security guard between private network and internet?", options: ["A) Switch", "B) Bridge", "C) Firewall", "D) Repeater"], ans: 2 },
+            { q: "What is the full form of Wi-Fi?", options: ["A) Wireless Fidelity", "B) Wired Fiber", "C) Wireless Fiber", "D) Window Fidelity"], ans: 0 },
+            { q: "Which key is used to edit a cell in MS Excel?", options: ["A) F2", "B) F3", "C) F4", "D) F5"], ans: 0 },
+            { q: "OTP stands for:", options: ["A) Only Time Password", "B) One Time Password", "C) Online Time Password", "D) Out Time Password"], ans: 1 },
+            { q: "Which of these is not an input device?", options: ["A) Keyboard", "B) Mouse", "C) Plotter", "D) Scanner"], ans: 2 },
+            { q: "Which menu in Word allows you to insert page numbers?", options: ["A) Home", "B) Insert", "C) Layout", "D) References"], ans: 1 },
+            { q: "Tally ERP 9 is mainly used for:", options: ["A) Graphic Design", "B) Video Editing", "C) Accounting", "D) Web Development"], ans: 2 },
+            { q: "What does 'HTTP 404' error mean?", options: ["A) Server crash", "B) Page not found", "C) Unauthorized access", "D) Virus detected"], ans: 1 },
+            { q: "Which chart type displays data as slices of a circle?", options: ["A) Bar", "B) Line", "C) Pie", "D) Scatter"], ans: 2 },
+            { q: "A half byte (4 bits) is known as a:", options: ["A) Bit", "B) Nibble", "C) Word", "D) Record"], ans: 1 },
+            { q: "What is the main function of the Operating System?", options: ["A) Create documents", "B) Manage computer hardware and software", "C) Browse internet", "D) Play games"], ans: 1 },
+            { q: "Which CSS property is used to make text italic?", options: ["A) font-style", "B) text-style", "C) font-weight", "D) text-decoration"], ans: 0 },
+            { q: "Which network covers the largest geographical area?", options: ["A) LAN", "B) PAN", "C) MAN", "D) WAN"], ans: 3 },
+            { q: "Which of the following is a volatile memory?", options: ["A) ROM", "B) Hard Disk", "C) RAM", "D) CD-ROM"], ans: 2 },
+            { q: "In JavaScript, 'Array' indexes start at:", options: ["A) 1", "B) 0", "C) -1", "D) length"], ans: 1 },
+            { q: "To change the name of a folder, which shortcut key is used?", options: ["A) F2", "B) F4", "C) F5", "D) F10"], ans: 0 },
+            { q: "Which port is standard for SMTP (Email)?", options: ["A) 80", "B) 443", "C) 21", "D) 25"], ans: 3 },
+            { q: "An Excel workbook is a collection of:", options: ["A) Workbooks", "B) Worksheets", "C) Charts", "D) Documents"], ans: 1 },
+            { q: "Which database object provides a formatted view of data for printing?", options: ["A) Table", "B) Form", "C) Query", "D) Report"], ans: 3 }
+        ]
+    };
+
+    // --- STATE VARIABLES ---
+    let currentSet = 1;
+    let timerInterval;
+    let timeRemaining = 30 * 60; // 30 mins
+    let userResults = {}; 
+
+    // Initialize Dashboard
+    window.onload = () => {
+        const setContainer = document.getElementById("set-buttons");
+        for (let i = 1; i <= 10; i++) {
+            let btn = document.createElement("button");
+            btn.className = "btn";
+            btn.innerText = "Start Set " + i;
+            
+            if(!testData[i] || testData[i].length === 0) {
+                btn.disabled = true;
+                btn.innerText += " (Coming Soon)";
+            } else {
+                btn.onclick = () => startTest(i);
+            }
+            setContainer.appendChild(btn);
+        }
+    };
+
+    // --- SMART BACK BUTTON LOGIC ---
+    function smartBack() {
+    clearInterval(timerInterval);
+    window.history.back(); // Yeh command exact history back trigger karegi
+}
+
+    // --- CORE TEST LOGIC ---
+    function startTest(setId) {
+        currentSet = setId;
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('test-view').style.display = 'block';
+        document.getElementById('set-title').innerText = 'Set ' + setId;
+        
+        const qContainer = document.getElementById('questions-container');
+        qContainer.innerHTML = '';
+        
+        testData[setId].forEach((qObj, index) => {
+            let html = `<div class="question-card">
+                <p>Q${index + 1}. ${qObj.q}</p>
+                <div class="options">`;
+            qObj.options.forEach((opt, optIndex) => {
+                html += `<label><input type="radio" name="q${index}" value="${optIndex}"> ${opt}</label>`;
+            });
+            html += `</div></div>`;
+            qContainer.innerHTML += html;
+        });
+
+        timeRemaining = 30 * 60;
+        updateTimerDisplay();
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeRemaining--;
+            updateTimerDisplay();
+            if(timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                manualSubmit();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        let minutes = Math.floor(timeRemaining / 60);
+        let seconds = timeRemaining % 60;
+        document.getElementById('time-display').innerText = 
+            (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+    }
+
+    function manualSubmit() {
+        clearInterval(timerInterval);
+        let score = 0;
+        let total = testData[currentSet].length;
+        
+        testData[currentSet].forEach((qObj, index) => {
+            let selected = document.querySelector(`input[name="q${index}"]:checked`);
+            if(selected && parseInt(selected.value) === qObj.ans) {
+                score++;
+            }
+        });
+        
+        userResults[currentSet] = { score: score, total: total };
+        
+        document.getElementById('test-view').style.display = 'none';
+        document.getElementById('result-view').style.display = 'block';
+        
+        let percentage = (score / total) * 100;
+        let isPass = percentage >= 50;
+        
+        document.getElementById('result-details').innerHTML = `
+            <h3>Set ${currentSet} Result</h3>
+            <p style="font-size: 20px;">Score: <strong>${score} / ${total}</strong></p>
+            <p style="font-size: 18px;">Percentage: <strong>${percentage.toFixed(1)}%</strong></p>
+            <p class="${isPass ? 'pass' : 'fail'}">${isPass ? 'PASSED \u2714' : 'FAILED \u2718'}</p>
+        `;
+    }
+
+    function returnToDashboard() {
+        smartBack(); // Re-use the smart back function
+    }
+
+    function showOverallResult() {
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('overall-view').style.display = 'block';
+        
+        let html = `<table>
+            <tr>
+                <th>Set No.</th>
+                <th>Questions Count</th>
+                <th>Score</th>
+                <th>Status</th>
+            </tr>`;
+            
+        for(let i = 1; i <= 10; i++) {
+            if(userResults[i]) {
+                let percentage = (userResults[i].score / userResults[i].total) * 100;
+                let status = percentage >= 50 ? '<span class="pass">Pass</span>' : '<span class="fail">Fail</span>';
+                html += `<tr>
+                    <td>Set ${i}</td>
+                    <td>${userResults[i].total}</td>
+                    <td>${userResults[i].score} / ${userResults[i].total}</td>
+                    <td>${status}</td>
+                </tr>`;
+            } else {
+                let qCount = testData[i] ? testData[i].length : 0;
+                html += `<tr>
+                    <td>Set ${i}</td>
+                    <td>${qCount}</td>
+                    <td>Not Attempted</td>
+                    <td>-</td>
+                </tr>`;
+            }
+        }
+        html += `</table>`;
+        document.getElementById('overall-table-container').innerHTML = html;
+    }
+</script>
+</body>
+</html>
